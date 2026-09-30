@@ -33,7 +33,7 @@ Use a mature substantial storage library rather than implementing a new journal.
 - `ValidatedConfig` is immutable, constructed only after key/peer/module/version validation; raw wire config is a distinct type. Private guardian shares and transport keys never enter public commitments.
 - Module transitions use `&mut WriteTransaction`, configured instance ID, transaction outpoint and/or proposing `PeerId`. Inputs return amount/fee/authorization key; outputs return amount/fee; consensus items report acceptance or a typed rejection. Closed Mint/Wallet dispatch and exact error precedence are coordinator-owned.
 - `FinalizedUnit` carries creator, round and optional data; every engine unit is delivered in order. Session owns accepted-item replay, header/signature phase and atomic completion. Engine stop is awaited before cleanup.
-- Bitcoin RPC produces local observations for proposals and serves agreed scans; broadcasts consume persisted outbox work after commit. No RPC handler mutates replicated state outside ordered execution.
+- Bitcoin RPC produces local observations for proposals and serves agreed scans; broadcasts consume persisted outbox work after commit. No RPC handler mutates replicated state outside ordered execution. The daemon selects exactly one adapter (`daemon::bitcoin::Backend`): loopback Core JSON-RPC (`CoreRpc`) or Esplora over HTTPS (`bitcoin::esplora::Esplora`, polled every 5 s instead of 1 s).
 - Server APIs read committed snapshots and wait on accepted-state notifications. Full endpoint/capability inventory is a separate D0 artifact. Peer history RPC uses configured module decoders. No new wallet client is introduced.
 
 ## Accepted runtime configuration contract

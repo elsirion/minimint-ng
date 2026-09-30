@@ -339,3 +339,26 @@ fn resolved_addresses_cannot_silently_change_advertised_ports() {
         Err(LifecycleError::InvalidAddresses)
     ));
 }
+#[test]
+fn fresh_and_restored_paths_accept_signet_profile() {
+    let (_listeners, addresses) = listeners(1);
+    let mut job = jobs(1, &addresses).remove(0);
+    job.inputs.records.get_mut(&PeerId(0)).unwrap().network = BitcoinNetwork::Signet;
+    let expected = expected(&job);
+    let generated = setup::generate(
+        job.inputs.peer,
+        &job.inputs.records,
+        &SetupDefaults::default(),
+        &mut NoTransport,
+    )
+    .unwrap();
+    let dir = fixture::TestDir::new();
+    let store = Store::open(dir.path()).unwrap();
+    setup::persist_generated(&store, &generated, &job.identity).unwrap();
+    let restored = lifecycle::load(&store, &expected).unwrap().unwrap();
+    assert_eq!(
+        restored.config().modules().wallet().config().network,
+        BitcoinNetwork::Signet
+    );
+    assert!(SetupPlan::new(job, &expected).is_ok());
+}

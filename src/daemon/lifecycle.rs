@@ -1,4 +1,4 @@
-//! Setup-to-runtime ownership boundary for the initial regtest/TCP/WS profile.
+//! Setup-to-runtime ownership boundary for the regtest/signet TCP/WS profile.
 //! DNS is a caller responsibility; advertised URLs are validated, never rewritten.
 use super::config::{RuntimeConfig, RuntimeConfigError, tcp_authority};
 use crate::{
@@ -82,8 +82,10 @@ fn profile(
         else {
             return Err(LifecycleError::InvalidProfile);
         };
-        if record.network != BitcoinNetwork::Regtest
-            || !api_url.as_str().starts_with("ws://")
+        if !matches!(
+            record.network,
+            BitcoinNetwork::Regtest | BitcoinNetwork::Signet
+        ) || !api_url.as_str().starts_with("ws://")
             || tcp_authority(p2p_url).is_err()
             || config::normalize_release(&record.release) != "0.13.0"
             || record

@@ -1,5 +1,8 @@
 //! Narrow daemon CLI. Secrets are supplied by files, never command-line values.
-use crate::config::CanonicalUrl;
+use crate::{
+    bitcoin::esplora::EsploraUrl,
+    config::{BitcoinNetwork, CanonicalUrl},
+};
 use std::{
     collections::BTreeMap,
     ffi::OsString,
@@ -12,19 +15,28 @@ use zeroize::Zeroizing;
 
 pub const USAGE: &str = "fedimintd --data-dir PATH --api-bind IP:PORT --p2p-bind IP:PORT \
 --api-url ws://HOST:PORT/ --p2p-url fedimint://HOST:PORT/ \
---bitcoin-rpc IP:PORT --bitcoin-rpc-credentials-file PATH --admin-secret-file PATH \
-[--access-secret-file PATH] [--round-delay-ms 50]\n\nInitial deployment profile: Bitcoin regtest, built-in Mint v2 and Wallet v2.\nCredentials file contains username:password (or Bitcoin Core cookie contents).\nSecret files require Linux x86_64 with /proc/self/fd mounted.\nThey must be private regular files without a final symlink; one final LF or CRLF is stripped.\n";
+(--bitcoin-rpc IP:PORT --bitcoin-rpc-credentials-file PATH | --esplora-url URL) \
+--admin-secret-file PATH [--bitcoin-network regtest|signet] [--access-secret-file PATH] \
+[--round-delay-ms 50]\n\nDeployment profile: Bitcoin regtest (default) or signet, built-in Mint v2 and Wallet v2.\nCredentials file contains username:password (or Bitcoin Core cookie contents).\nEsplora URL: https://HOST[:PORT][/PATH] (system trust store), or http:// with a loopback IP.\nSecret files require Linux x86_64 with /proc/self/fd mounted.\nThey must be private regular files without a final symlink; one final LF or CRLF is stripped.\n";
 pub struct Options {
     pub data_dir: PathBuf,
     pub api_bind: SocketAddr,
     pub p2p_bind: SocketAddr,
     pub api_url: CanonicalUrl,
     pub p2p_url: CanonicalUrl,
-    pub bitcoin_rpc: SocketAddr,
-    pub bitcoin_credentials_file: PathBuf,
+    pub bitcoin: BitcoinSource,
+    pub bitcoin_network: BitcoinNetwork,
     pub admin_secret_file: PathBuf,
     pub access_secret_file: Option<PathBuf>,
     pub round_delay: Duration,
+}
+/// Exactly one Bitcoin backend adapter is configured.
+pub enum BitcoinSource {
+    Core {
+        rpc: SocketAddr,
+        credentials_file: PathBuf,
+    },
+    Esplora(EsploraUrl),
 }
 pub enum Command {
     Run(Box<Options>),
@@ -84,6 +96,8 @@ pub fn parse(args: impl IntoIterator<Item = OsString>) -> Result<Command, Option
                 | "--p2p-url"
                 | "--bitcoin-rpc"
                 | "--bitcoin-rpc-credentials-file"
+                | "--esplora-url"
+                | "--bitcoin-network"
                 | "--admin-secret-file"
                 | "--access-secret-file"
                 | "--round-delay-ms"
@@ -113,14 +127,38 @@ pub fn parse(args: impl IntoIterator<Item = OsString>) -> Result<Command, Option
     if !api_url.as_str().starts_with("ws://") || super::config::tcp_authority(&p2p_url).is_err() {
         return Err(OptionsError::Profile);
     }
-    let bitcoin_rpc: SocketAddr = string(take("--bitcoin-rpc")?)?
-        .parse()
-        .map_err(|_| OptionsError::Address)?;
-    if !bitcoin_rpc.ip().is_loopback() {
-        return Err(OptionsError::Profile);
-    }
-    let bitcoin_credentials_file = PathBuf::from(take("--bitcoin-rpc-credentials-file")?);
     let admin_secret_file = PathBuf::from(take("--admin-secret-file")?);
+    let bitcoin = match (
+        fields.remove("--bitcoin-rpc"),
+        fields.remove("--bitcoin-rpc-credentials-file"),
+        fields.remove("--esplora-url"),
+    ) {
+        (Some(rpc), Some(credentials_file), None) => {
+            let rpc: SocketAddr = string(rpc)?.parse().map_err(|_| OptionsError::Address)?;
+            if !rpc.ip().is_loopback() {
+                return Err(OptionsError::Profile);
+            }
+            BitcoinSource::Core {
+                rpc,
+                credentials_file: PathBuf::from(credentials_file),
+            }
+        }
+        (None, None, Some(url)) => {
+            BitcoinSource::Esplora(EsploraUrl::parse(&string(url)?).map_err(|_| OptionsError::Url)?)
+        }
+        (None, None, None) | (Some(_), None, None) | (None, Some(_), None) => {
+            return Err(OptionsError::Missing);
+        }
+        _ => return Err(OptionsError::Argument),
+    };
+    let bitcoin_network = match fields.remove("--bitcoin-network").map(string).transpose()? {
+        None => BitcoinNetwork::Regtest,
+        Some(network) => match network.as_str() {
+            "regtest" => BitcoinNetwork::Regtest,
+            "signet" => BitcoinNetwork::Signet,
+            _ => return Err(OptionsError::Profile),
+        },
+    };
     let access_secret_file = fields.remove("--access-secret-file").map(PathBuf::from);
     let delay = fields
         .remove("--round-delay-ms")
@@ -138,8 +176,8 @@ pub fn parse(args: impl IntoIterator<Item = OsString>) -> Result<Command, Option
         p2p_bind,
         api_url,
         p2p_url,
-        bitcoin_rpc,
-        bitcoin_credentials_file,
+        bitcoin,
+        bitcoin_network,
         admin_secret_file,
         access_secret_file,
         round_delay: Duration::from_millis(delay),

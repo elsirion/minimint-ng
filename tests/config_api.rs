@@ -403,3 +403,42 @@ fn broadcast_keys_are_compressed_hex_and_iroh_is_excluded_from_legacy_hash() {
         json!(hex_encode(&key))
     );
 }
+
+#[test]
+fn diagnostic_names_signet_and_rejects_networks_without_evidence() {
+    use minimint_ng::{
+        api::config::diagnostic_client_config_value,
+        codec::ConsensusEncode,
+        config::{BitcoinNetwork, RawWalletConfig},
+    };
+    let mut client = captured_client();
+    let (id, _) = client
+        .modules
+        .iter()
+        .find(|(_, module)| module.kind == "walletv2")
+        .map(|(id, module)| (*id, module.clone()))
+        .unwrap();
+    let with_network = |client: &mut config::RawClientConfig, network| {
+        let module = client.modules.get_mut(&id).unwrap();
+        let mut wallet: RawWalletConfig = decode_whole(&module.config.payload).unwrap();
+        wallet.network = network;
+        module.config.payload = wallet.consensus_encode();
+    };
+    with_network(&mut client, BitcoinNetwork::Signet);
+    let diagnostic = diagnostic_client_config_value(&client).unwrap();
+    assert_eq!(
+        diagnostic["modules"][&id.0.to_string()]["network"].as_str(),
+        Some("signet")
+    );
+    for network in [
+        BitcoinNetwork::Mainnet,
+        BitcoinNetwork::Testnet3,
+        BitcoinNetwork::Testnet4,
+    ] {
+        with_network(&mut client, network);
+        assert_eq!(
+            diagnostic_client_config_value(&client),
+            Err(ConfigApiError::InvalidConfiguration)
+        );
+    }
+}

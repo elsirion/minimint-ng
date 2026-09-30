@@ -1,5 +1,7 @@
 //! Bitcoin wire bytes and the narrow backend boundary used by the Wallet module.
 //! Hash arrays are internal digest order; only display hex reverses them.
+pub mod esplora;
+pub mod http;
 pub mod rpc;
 use crate::{
     codec::{

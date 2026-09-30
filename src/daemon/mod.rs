@@ -1,4 +1,5 @@
 //! Guardian process lifecycle and validated runtime configuration.
+pub mod bitcoin;
 pub mod catchup;
 pub mod config;
 pub mod consensus;

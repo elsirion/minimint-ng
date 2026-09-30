@@ -1,11 +1,12 @@
 //! Process orchestration. A watchdog bounds startup I/O and shutdown separately;
 //! loss of quorum alone never triggers shutdown.
 use super::{
+    bitcoin::Backend,
     catchup::{Catchup, CatchupEndpoint, CatchupError, CatchupOptions},
     config::tcp_authority,
     consensus::{Runtime, RuntimeHandle, RuntimeOptions},
     lifecycle::{self, AdvertisedEndpoints, Generation, ReadyRuntime, SetupPlan},
-    options::{Options, read_secret},
+    options::{BitcoinSource, Options, read_secret},
     service::{RunningApi, RunningApiOptions, Service},
     shutdown::Shutdown,
 };
@@ -16,10 +17,12 @@ use crate::{
         setup::SetupApi,
         websocket::Limits,
     },
-    bitcoin::rpc::CoreRpc,
-    config::{
-        ApiVersions, BitcoinNetwork, CanonicalUrl, CoreSupport, ModuleSupport, SupportSummary,
+    bitcoin::{
+        BackendError,
+        esplora::{Esplora, EsploraOptions},
+        rpc::CoreRpc,
     },
+    config::{ApiVersions, CanonicalUrl, CoreSupport, ModuleSupport, SupportSummary},
     net::PeerNetwork,
     protocol::PeerId,
     setup::SetupState,
@@ -161,10 +164,46 @@ fn resolve_api(url: &CanonicalUrl, shutdown: &Shutdown) -> Result<Vec<SocketAddr
     };
     resolve(&authority, shutdown)
 }
+fn bitcoin_backend(source: &BitcoinSource) -> Result<Backend, ProcessError> {
+    let invalid = |_| ProcessError("Invalid Bitcoin backend configuration");
+    match source {
+        BitcoinSource::Core {
+            rpc,
+            credentials_file,
+        } => {
+            let credentials = read_secret(credentials_file)
+                .map_err(|_| ProcessError("Invalid Bitcoin credentials file"))?;
+            CoreRpc::new(*rpc, &credentials, Duration::from_secs(10), 6)
+                .map(Backend::Core)
+                .map_err(invalid)
+        }
+        BitcoinSource::Esplora(url) => Esplora::new(
+            url.clone(),
+            EsploraOptions {
+                timeout: Duration::from_secs(15),
+                fee_target: 6,
+                extra_roots: vec![],
+            },
+            // Same bounded, killable helper as guardian endpoint resolution;
+            // the Wallet poller must not block on an unbounded DNS lookup.
+            Box::new(|authority, stop| {
+                super::resolve::resolve(
+                    std::path::Path::new("/proc/self/exe"),
+                    authority,
+                    STARTUP_IO,
+                    stop,
+                )
+                .map_err(|_| BackendError)
+            }),
+        )
+        .map(Backend::Esplora)
+        .map_err(invalid),
+    }
+}
 struct Context<'a> {
     options: &'a Options,
     store: Store,
-    backend: Arc<CoreRpc>,
+    backend: Arc<Backend>,
     admin: Zeroizing<String>,
     access: Option<Zeroizing<String>>,
     shutdown: &'a Shutdown,
@@ -188,6 +227,7 @@ impl Context<'_> {
             self.backend.clone(),
             RuntimeOptions {
                 round_delay_ms: self.options.round_delay.as_millis() as u64,
+                wallet_poll_interval: self.backend.poll_interval(),
                 ..RuntimeOptions::default()
             },
         )
@@ -369,18 +409,7 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
             .map(|path| read_secret(path))
             .transpose()
             .map_err(|_| ProcessError("Invalid access secret file"))?;
-        let credentials = read_secret(&options.bitcoin_credentials_file)
-            .map_err(|_| ProcessError("Invalid Bitcoin credentials file"))?;
-        let backend = Arc::new(
-            CoreRpc::new(
-                options.bitcoin_rpc,
-                &credentials,
-                Duration::from_secs(10),
-                6,
-            )
-            .map_err(|_| ProcessError("Invalid Bitcoin backend configuration"))?,
-        );
-        drop(credentials);
+        let backend = Arc::new(bitcoin_backend(&options.bitcoin)?);
         let store = Store::open(&options.data_dir)
             .map_err(|_| ProcessError("Guardian storage open failed"))?;
         // Keep the final database owner outside the fallible startup closure;
@@ -392,6 +421,11 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
         };
         let restored = lifecycle::load(&store, &expected)
             .map_err(|_| ProcessError("Stored guardian configuration invalid"))?;
+        if restored.as_ref().is_some_and(|restored| {
+            restored.config().modules().wallet().config().network != options.bitcoin_network
+        }) {
+            return Err(ProcessError("Stored Bitcoin network differs from options"));
+        }
         let api_listener = TcpListener::bind(options.api_bind)
             .map_err(|_| ProcessError("API listener bind failed"))?;
         let peer_listener = TcpListener::bind(options.p2p_bind)
@@ -420,7 +454,7 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
                 SetupState::new(
                     options.api_url.clone(),
                     options.p2p_url.clone(),
-                    BitcoinNetwork::Regtest,
+                    options.bitcoin_network,
                     "0.13.0".into(),
                 ),
                 context.admin.clone(),

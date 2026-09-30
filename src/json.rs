@@ -138,6 +138,61 @@ pub fn scaled_unsigned(value: &Value, decimal_places: u32) -> Result<u64, JsonEr
         .ok_or(JsonError::Type)
 }
 
+/// Like `scaled_unsigned`, but rounds an inexact scaled value half-up to an
+/// integer instead of rejecting it. Only for observations that are themselves
+/// estimates (for example sat/vB fee estimates rendered by an HTTP service);
+/// never for amounts. The computation is on the exact decimal lexeme.
+pub fn rounded_scaled_unsigned(value: &Value, decimal_places: u32) -> Result<u64, JsonError> {
+    let text = number_text(value)?;
+    if text.starts_with('-') {
+        return Err(JsonError::Type);
+    }
+    let (mantissa, exponent) = text.split_once(['e', 'E']).unwrap_or((&text, "0"));
+    let fractional = mantissa.split_once('.').map_or(0, |(_, tail)| tail.len());
+    let digits: String = mantissa.chars().filter(|c| *c != '.').collect();
+    if digits.is_empty() || !digits.bytes().all(|b| b.is_ascii_digit()) {
+        return Err(JsonError::Type);
+    }
+    let significant = digits.trim_start_matches('0');
+    if significant.is_empty() {
+        return Ok(0);
+    }
+    let exponent: i128 = exponent.parse().map_err(|_| JsonError::Type)?;
+    let power = exponent
+        .checked_add(i128::from(decimal_places))
+        .and_then(|p| p.checked_sub(fractional as i128))
+        .ok_or(JsonError::Type)?;
+    let length = significant.len() as i128;
+    if power >= 0 {
+        // A nonzero value with more than 20 integer digits exceeds u64.
+        if length.checked_add(power).is_none_or(|n| n > 20) {
+            return Err(JsonError::Type);
+        }
+        let coefficient: u64 = significant.parse().map_err(|_| JsonError::Type)?;
+        return coefficient
+            .checked_mul(10u64.pow(power as u32))
+            .ok_or(JsonError::Type);
+    }
+    // Keep `length + power` integer digits; the next digit decides rounding.
+    let keep = length.checked_add(power).ok_or(JsonError::Type)?;
+    if keep < 0 {
+        // The first discarded digit is an implicit leading zero.
+        return Ok(0);
+    }
+    let keep = keep as usize;
+    if keep > 20 {
+        return Err(JsonError::Type);
+    }
+    let integer: u64 = match &significant[..keep] {
+        "" => 0,
+        head => head.parse().map_err(|_| JsonError::Type)?,
+    };
+    let round_up = significant.as_bytes()[keep] >= b'5';
+    integer
+        .checked_add(u64::from(round_up))
+        .ok_or(JsonError::Type)
+}
+
 pub fn encode(value: &Value) -> Result<Vec<u8>, JsonError> {
     sonic_rs::to_vec(value).map_err(|_| JsonError::Type)
 }

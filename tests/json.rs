@@ -121,6 +121,54 @@ fn raw_number_lexemes_roundtrip_exactly_and_scaling_is_checked() {
 }
 
 #[test]
+fn rounded_scaling_rounds_exact_lexeme_half_up() {
+    use minimint_ng::json::rounded_scaled_unsigned;
+    for (text, scale, expected) in [
+        // Esplora renders Core's 1070 sat/kvB as this sat/vB float.
+        ("1.0699999999999998", 3, 1070),
+        ("1.014", 3, 1014),
+        ("1.0005", 3, 1001),
+        ("1.00049999", 3, 1000),
+        ("1", 3, 1000),
+        ("0.0004", 3, 0),
+        ("0.0005", 3, 1),
+        ("4e-4", 3, 0),
+        ("5e-4", 3, 1),
+        ("1e-999999999999999999999999999999", 3, 0),
+        ("2.5E+1", 0, 25),
+        ("0.00001000", 8, 1000),
+        ("18446744073709551.615", 3, u64::MAX),
+        ("18446744073709551614.5", 0, u64::MAX),
+        ("0e999999999999999999999999999999", 3, 0),
+    ] {
+        let value = parse(text.as_bytes(), 1024, 8).unwrap();
+        assert_eq!(
+            rounded_scaled_unsigned(&value, scale),
+            Ok(expected),
+            "{text}"
+        );
+    }
+    for text in [
+        "-1",
+        "-0",
+        "18446744073709551615.5",
+        "18446744073709551.616",
+        "1e17",
+        "1e999999999999999999999999999999",
+        "true",
+        "\"1\"",
+        "null",
+    ] {
+        let value = parse(text.as_bytes(), 1024, 8).unwrap();
+        assert_eq!(
+            rounded_scaled_unsigned(&value, 3),
+            Err(JsonError::Type),
+            "{text}"
+        );
+    }
+}
+
+#[test]
 fn decimal_scaling_matches_integer_arithmetic_for_small_exact_values() {
     use minimint_ng::json::scaled_unsigned;
     for numerator in [0u64, 1, 2, 9, 10, 11, 12345, 99999999] {

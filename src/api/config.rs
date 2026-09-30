@@ -1,4 +1,4 @@
-//! CFG/VER endpoints and the observed closed regtest diagnostic profile.
+//! CFG/VER endpoints and the observed closed regtest/signet diagnostic profile.
 use crate::{
     codec::{decode_whole, text::hex_encode},
     config::{ApiVersions, Invite, RawClientConfig, RawServerConfig, SupportSummary},
@@ -115,15 +115,17 @@ pub fn diagnostic_client_config_value(config: &RawClientConfig) -> Result<Value,
             "walletv2" => {
                 let wallet: RawWalletConfig = decode_whole(&module.config.payload)
                     .map_err(|_| ConfigApiError::InvalidConfiguration)?;
-                if wallet.network != BitcoinNetwork::Regtest {
-                    return Err(ConfigApiError::InvalidConfiguration);
-                }
+                let network = match wallet.network {
+                    BitcoinNetwork::Regtest => "regtest",
+                    BitcoinNetwork::Signet => "signet",
+                    _ => return Err(ConfigApiError::InvalidConfiguration),
+                };
                 let keys: BTreeMap<_, _> = wallet
                     .bitcoin_pks
                     .iter()
                     .map(|(peer, key)| (peer.0.to_string(), hex_encode(key)))
                     .collect();
-                json!({"kind":"walletv2","bitcoin_pks":keys,"descriptor":"Wsh","network":"regtest",
+                json!({"kind":"walletv2","bitcoin_pks":keys,"descriptor":"Wsh","network":network,
                     "dust_limit":wallet.dust_limit,"feerate_base":wallet.feerate_base,
                     "receive_tx_vbytes":wallet.receive_tx_vbytes,"send_tx_vbytes":wallet.send_tx_vbytes,
                     "fee_consensus":{"base":wallet.fee_consensus.base,"parts_per_million":wallet.fee_consensus.parts_per_million}})
