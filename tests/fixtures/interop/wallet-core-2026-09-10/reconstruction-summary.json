@@ -1,0 +1,33 @@
+{
+  "scope": "POST-RUN READ-ONLY RECONSTRUCTION; not original prebroadcast or mempool captures",
+  "current_height": 134,
+  "confirmation_height": 128,
+  "consolidation": "54fbc5d65193e59d2cab948470dd3ba1c880c1401eb878886db84d32bbf544a0",
+  "withdrawal": "e10abaf7b1c9413a5e605e0063c0eacfba906598f8d755118040241849c4ab36",
+  "funding": [
+    {
+      "txid": "5af7cdfcdb6a33de692e44846afaa0ee0474f8c04f8049bc24654b3848897c6b",
+      "vout": 1,
+      "height": 114,
+      "fee_sat": 1414
+    },
+    {
+      "txid": "a94a5284d700144f5a1b3eb7a9a357f28fc3207ce11d12d9d332a52f68e32950",
+      "vout": 1,
+      "height": 121,
+      "fee_sat": 424
+    }
+  ],
+  "consolidation_fee_sat": 632,
+  "withdrawal_fee_sat": 456,
+  "aggregate_actual_fee_sat": 2926,
+  "lost": [
+    "original Store",
+    "original artifact metadata",
+    "original prebroadcast testmempoolaccept replies including bad witness",
+    "original mempool entries",
+    "original mining intents"
+  ],
+  "run_assertions_source": "Tool session64394 stdout reports pass; not reconstructed historical proof",
+  "no_funded_rerun": true
+}

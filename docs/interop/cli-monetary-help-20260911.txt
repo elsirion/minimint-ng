@@ -1,0 +1,83 @@
+Public CLI help captured 2026-09-11.
+Exact revision: 0c316439d60b5a08eea26fab216780eb893c45bf
+Executable SHA-256: 4c93df5a0cd6633ac7add340d7089b712b14b6a48655df89f9bfbb8a2d7eed23
+All five help invocations exited 0. Database-lock diagnostic lines omitted.
+No funding, transfer, join, or Core operation was invoked.
+
+Additional public help: CLI dev session-count --help
+Gets the current fedimint AlephBFT block count
+Usage: fedimint-cli dev session-count
+
+Later fresh unfunded diagnostic observation (2026-09-11):
+Command: CLI dev session-count
+Exact JSON stdout: {"count":0}
+The initial integer-only parser rejected this object before any funding.
+The harness then joined its guardians; funded amount and Bitcoin fees were zero.
+The driver now requires exactly one count field containing an unsigned 64-bit
+integer, rejecting booleans, negative values, strings, overflow and extra fields.
+This records an observed response shape, not a monetary-workflow success.
+These help outputs do not specify numeric units or suffix grammar for AMOUNT,
+VALUE, or FEE; no numeric parser behavior is inferred from placeholder names.
+
+Command: CLI module mintv2 -- send --help
+Send `ECash` for the given amount
+
+Usage: mintv2 send [OPTIONS] <AMOUNT>
+
+Arguments:
+  <AMOUNT>
+
+Options:
+      --include-invite  Embed the federation's invite code in the serialized ecash so a recipient that hasn't joined the federation can do so from it
+  -h, --help            Print help
+
+Command: CLI module mintv2 -- receive --help
+Receive the `ECash` by reissuing the notes and return the amount
+
+Usage: mintv2 receive <ECASH>
+
+Arguments:
+  <ECASH>
+
+Options:
+  -h, --help  Print help
+
+Command: CLI module walletv2 -- send --help
+Send an onchain payment
+
+Usage: walletv2 send [OPTIONS] <ADDRESS> <VALUE>
+
+Arguments:
+  <ADDRESS>
+  <VALUE>    Value to send, or "all" to sweep the entire balance
+
+Options:
+      --fee <FEE>
+  -h, --help       Print help
+
+Command: CLI module walletv2 -- receive --help
+Return the next unused receive address.
+
+To wait for a payment to this address, read the current event log position with
+`dev next-event-log-id` *before* running this, then pass that position to
+`await-receive`.
+
+Usage: walletv2 receive
+
+Options:
+  -h, --help
+          Print help (see a summary with '-h')
+
+Command: CLI module walletv2 -- await-receive --help
+Block until the next payment is received, starting from the given event log
+position. Returns the receive's final state and the event log position to pass
+to the following `await-receive`
+
+Usage: walletv2 await-receive <POSITION>
+
+Arguments:
+  <POSITION>  Event log position to start scanning from, as returned by
+              `dev next-event-log-id` or a prior `await-receive`
+
+Options:
+  -h, --help  Print help

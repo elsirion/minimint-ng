@@ -1,0 +1,2464 @@
+{
+  "baseline_sha256": "78d538f1d031156de1ac74039467e93fad52fe3558da1437bab1b253fd3dbf72",
+  "packages": [
+    {
+      "name": "ahash",
+      "version": "0.8.12",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5a15f179cd60c4584b8a8c596927aadc462e27f2ca70c04e0071964a73ba7a75",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "getrandom",
+        "runtime-rng",
+        "std"
+      ]
+    },
+    {
+      "name": "aleph-bft-crypto",
+      "version": "0.9.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "4e99189e0c434af4bb0f4238925df15091962ae843f509561def48ecf36c163d",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "aleph-bft-rmc",
+      "version": "0.12.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5e9a4418a90817c8c4929d55019eeb2bdf1d4a6030d557f17b3f580723ab40f8",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "aleph-bft-types",
+      "version": "0.12.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7afbf87383e06ccfe9386cda59e57ac9d899267cc765fee654d921e4ba779f92",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "aleph-bft-types",
+      "version": "0.13.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "2bca9d19f587215da2b6c50b5e71f9addbf2305153f850dad3f9496ed67e28bb",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "anyhow",
+      "version": "1.0.102",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7f202df86484c868dbad7eaa557ef785d5c66295e41b460ef922eca0723b842c",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "arrayvec",
+      "version": "0.7.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "async-trait",
+      "version": "0.1.89",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "9035ad2d096bed7955a320ee7e2230574d28fd3c3a0f186cbea1ff3c7eed5dbb",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "autocfg",
+      "version": "1.5.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "base16ct",
+      "version": "1.0.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "fd307490d624467aa6f74b0eabb77633d1f758a7b25f12bceb0b22e08d9726f6",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "base64ct",
+      "version": "1.8.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "2af50177e190e07a26ab74f8b1efbfe2ef87da2116221318cb1c2e82baf7de06",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "bit-vec",
+      "version": "0.8.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "bitflags",
+      "version": "2.11.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "c4512299f36f043ab09a583e57bceb5a5aab7a73db1805848e8fef3c9e8c78b3",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "block-buffer",
+      "version": "0.12.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "d2f6c7dbe95a6ed67ad9f18e57daf93a2f034c524b99fd2b76d18fdfeb6660aa",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "blst",
+      "version": "0.3.17",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "c20659f9bbee16cbbd2f7393e40ab6309f5a98f76a2eb57a995ec508b72387fe",
+      "overlap": "distinct-name",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "bumpalo",
+      "version": "3.20.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "byte-slice-cast",
+      "version": "1.2.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7575182f7272186991736b70173b0ea045398f984bf5ebbb3804736ce1330c9d",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "byteorder-lite",
+      "version": "0.1.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "8f1fe948ff07f4bd06c30984e69f5b4899c516a3ef74f34df92a2df2ab535495",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "bytes",
+      "version": "1.12.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "fc652a48c352aef3ea3aed32080501cf3ef6ed5da78602a020c991775b0aff04",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "byteview",
+      "version": "0.10.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "0d74937895e761d5984206f82ca8ff7725d0fd8021921011921894b41ab1b9f7",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "cc",
+      "version": "1.4.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "005ec2760ca554fae18df7a11195552ec576cd665632a881bc011d5bb2fd4d80",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "cfg-if",
+      "version": "1.0.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "9555578bc9e57714c812a1f84e4fc5b4d21fcb063490c624de019f7464c91268",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "cmov",
+      "version": "0.5.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "0c9ea0ac24bc397ab3c98583a3c9ba74fa56b09a4449bbe172b9b1ddb016027a",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "compare",
+      "version": "0.0.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ea0095f6103c2a8b44acd6fd15960c801dafebf02e21940360833e0673f48ba7",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "const-oid",
+      "version": "0.10.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a6ef517f0926dd24a1582492c791b6a4818a4d94e789a334894aa15b0d12f55c",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "const_format",
+      "version": "0.2.34",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "126f97965c8ad46d6d9163268ff28432e8f6a1196a55578867832e3049df63dd",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "const_format_proc_macros",
+      "version": "0.2.34",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1d57c2eccfb16dbac1f4e61e206105db5820c9d26c3c472bc17c774259ef7744",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "convert_case",
+      "version": "0.6.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ec182b0ca2f35d8fc196cf3404988fd8b8c739a4d270ff118a398feb0cbec1ca",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "cpubits",
+      "version": "0.1.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "15b85f9c39137c3a891689859392b1bd49812121d0d61c9caf00d46ed5ce06ae",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "cpufeatures",
+      "version": "0.3.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5ca28b0ae3115b884660db4118d803791fd6756b6e88f39c0f3f7859060d7566",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "crossbeam-epoch",
+      "version": "0.9.21",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "dc74980687109a3b14c72fd458107bf0baa1da1a1a805e178d15501ba9b86d9d",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "crossbeam-skiplist",
+      "version": "0.1.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "df29de440c58ca2cc6e587ec3d22347551a32435fbde9d2bff64e78a9ffa151b",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "crossbeam-utils",
+      "version": "0.8.23",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a31eee39dddec8330830986fcd7625edb5a24ec90ea038215273bbc3adb08ac6",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "crypto-bigint",
+      "version": "0.7.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1a52aa3fcda4e6302a9f48734f234d35d4721b96f8fe07d073f07ce9df4f0271",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "getrandom",
+        "hybrid-array",
+        "rand_core",
+        "subtle",
+        "zeroize"
+      ]
+    },
+    {
+      "name": "crypto-common",
+      "version": "0.2.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ce6e4c961d6cd6c9a86db418387425e8bdeaf05b3c8bc1411e6dca4c252f1453",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "getrandom",
+        "rand_core"
+      ]
+    },
+    {
+      "name": "ctutils",
+      "version": "0.4.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7d5515a3834141de9eafb9717ad39eea8247b5674e6066c404e8c4b365d2a29e",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "subtle"
+      ]
+    },
+    {
+      "name": "dashmap",
+      "version": "6.1.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5041cc499144891f3790297212f32a74fb938e5136a14943f338ef9e0ae276cf",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "der",
+      "version": "0.8.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a878c850e9e421b20262e9b41f9c860e4785fa07541c266b62ff9d1ef998a80a",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "oid",
+        "std",
+        "zeroize"
+      ]
+    },
+    {
+      "name": "derivative",
+      "version": "2.2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "fcc3dd5e9e9c0b295d6e1e4d811fb6f157d5ffd784b8d202fc62eac8035a770b",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "derive_more",
+      "version": "1.0.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "4a9b99b9cbbe49445b21764dc0625032a89b145a2642e67603e1c936f5458d05",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "add",
+        "add_assign",
+        "as_ref",
+        "constructor",
+        "debug",
+        "default",
+        "deref",
+        "deref_mut",
+        "display",
+        "error",
+        "from",
+        "from_str",
+        "full",
+        "index",
+        "index_mut",
+        "into",
+        "into_iterator",
+        "is_variant",
+        "mul",
+        "mul_assign",
+        "not",
+        "std",
+        "sum",
+        "try_from",
+        "try_into",
+        "try_unwrap",
+        "unwrap"
+      ]
+    },
+    {
+      "name": "derive_more-impl",
+      "version": "1.0.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "cb7330aeadfbe296029522e6c40f315320aba36fc43a5b3632f3795348f3bd22",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": [
+        "add",
+        "add_assign",
+        "as_ref",
+        "constructor",
+        "debug",
+        "default",
+        "deref",
+        "deref_mut",
+        "display",
+        "error",
+        "from",
+        "from_str",
+        "index",
+        "index_mut",
+        "into",
+        "into_iterator",
+        "is_variant",
+        "mul",
+        "mul_assign",
+        "not",
+        "sum",
+        "try_from",
+        "try_into",
+        "try_unwrap",
+        "unwrap"
+      ]
+    },
+    {
+      "name": "digest",
+      "version": "0.11.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f1dd6dbb5841937940781866fa1281a1ff7bd3bf827091440879f9994983d5c2",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "block-api",
+        "default",
+        "mac",
+        "oid"
+      ]
+    },
+    {
+      "name": "ecdsa",
+      "version": "0.17.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "c0681a4fc24c767085329728d8dfba959af91228aa4610cca4f8ce317ba46ae0",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "algorithm",
+        "alloc",
+        "der",
+        "digest",
+        "getrandom",
+        "spki",
+        "std"
+      ]
+    },
+    {
+      "name": "either",
+      "version": "1.15.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "48c757948c5ede0e46177b7add2e67155f70e33c07fea8284df6576da70b3719",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std",
+        "use_std"
+      ]
+    },
+    {
+      "name": "elliptic-curve",
+      "version": "0.14.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "9d65aa39b3a5c1c9c1b745c9a019234bb7a21b77abcb4f4d266d706e2d577d65",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "arithmetic",
+        "digest",
+        "ff",
+        "getrandom",
+        "group",
+        "sec1",
+        "std"
+      ]
+    },
+    {
+      "name": "enum_dispatch",
+      "version": "0.3.13",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "aa18ce2bc66555b3218614519ac839ddb759a7d6720732f979ef8d13be147ecd",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "equivalent",
+      "version": "1.0.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "errno",
+      "version": "0.3.14",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "39cab71617ae0d63f51a36d69f866391735b51691dbda63cf6f96d042b63efeb",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "fastrand",
+      "version": "2.5.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "faststr",
+      "version": "0.2.34",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1ca7d44d22004409a61c393afb3369c8f7bb74abcae49fe249ee01dcc3002113",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "serde",
+        "std"
+      ]
+    },
+    {
+      "name": "fedimint-aleph-bft",
+      "version": "0.36.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "8b21015ab681cdddedd866fe4af9169901012e9a8bd4745da8423131cccae025",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "ff",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a1f686ab92a9fb0eaf188f6c6c87b89490baa6fdb0db4544ba4dc47f7942489f",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "find-msvc-tools",
+      "version": "0.1.12",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "3e0f1c7c3a72c66fd80abe965175f7523475c0489a87d3ff9d6e8c87d87a9d2d",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "fjall",
+      "version": "3.1.10",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "cd201c93927cdf4712e8f7d4c9c8d34d68c7534380c05d4a58864a309f91c33f",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "flume",
+      "version": "0.12.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5e139bc46ca777eb5efaf62df0ab8cc5fd400866427e56c68b22e414e53bd3be",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "foreign-types",
+      "version": "0.3.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f6f339eb8adc052cd2ca78910fda869aefa38d22d5cb648e6485e4d3fc06f3b1",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "foreign-types-shared",
+      "version": "0.1.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "00b0228411908ca8685dba7fc2cdd70ec9990a6e753e89b6ac91a84c40fbaf4b",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "futures",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "8b147ee9d1f6d097cef9ce628cd2ee62288d963e16fb287bd9286455b241382d",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "async-await",
+        "default",
+        "executor",
+        "futures-executor",
+        "std"
+      ]
+    },
+    {
+      "name": "futures-channel",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "07bbe89c50d7a535e539b8c17bc0b49bdb77747034daa8087407d655f3f7cc1d",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "futures-sink",
+        "sink",
+        "std"
+      ]
+    },
+    {
+      "name": "futures-core",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7e3450815272ef58cec6d564423f6e755e25379b217b0bc688e295ba24df6b1d",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "futures-executor",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "baf29c38818342a3b26b5b923639e7b1f4a61fc5e76102d4b1981c6dc7a7579d",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "futures-io",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "cecba35d7ad927e23624b22ad55235f2239cfa44fd10428eecbeba6d6a717718",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "futures-macro",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e835b70203e41293343137df5c0664546da5745f82ec9b84d40be8336958447b",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "futures-sink",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "c39754e157331b013978ec91992bde1ac089843443c49cbc7f46150b0fad0893",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "futures-task",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "037711b3d59c33004d3856fbdc83b99d4ff37a24768fa1be9ce3538a1cde4393",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "futures-timer",
+      "version": "3.0.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f288b0a4f20f9a56b5d1da57e2227c661b7b16168e2f72365f57b63326e29b24",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "futures-util",
+      "version": "0.3.32",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "389ca41296e6190b48053de0321d02a77f32f8a5d2461dd38762c0593805c6d6",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "async-await",
+        "async-await-macro",
+        "channel",
+        "futures-channel",
+        "futures-io",
+        "futures-macro",
+        "futures-sink",
+        "io",
+        "memchr",
+        "sink",
+        "slab",
+        "std"
+      ]
+    },
+    {
+      "name": "getrandom",
+      "version": "0.2.16",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "335ff9f135e4384c8150d6f27c6daed433577f86b4750418338c01a1a2528592",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "getrandom",
+      "version": "0.3.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "getrandom",
+      "version": "0.4.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "sys_rng"
+      ]
+    },
+    {
+      "name": "glob",
+      "version": "0.3.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e4eba85ea1d0a966a983acd07deee566e67395d2d96b6fb39e62b5a833f1eb0b",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "group",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7fd1a1c7a5206c5b7a3f5a0d7ccd3ff85d0c8f5133d62a02680255b0004af5f4",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.14.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "raw"
+      ]
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.15.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5971ac85611da7067dbfcabef3c70ebb5606018acd9e2a3903a0da507521e0d5",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.16.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "inline-more"
+      ]
+    },
+    {
+      "name": "hashbrown",
+      "version": "0.17.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "hermit-abi",
+      "version": "0.5.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e17592d60ebacc7d5e169f4663c5f84f9161cc90328abcfe8456f41e4dfcb284",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "hmac",
+      "version": "0.13.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "6303bc9732ae41b04cb554b844a762b4115a61bfaa81e3e83050991eeb56863f",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "hybrid-array",
+      "version": "0.4.15",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "27f864f10dfb56725ce5ce5472bc52252c8f93a4ab86327122cebf62c5f59a17",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "subtle",
+        "zeroize"
+      ]
+    },
+    {
+      "name": "impl-trait-for-tuples",
+      "version": "0.2.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a0eb5a3343abf848c0984fe4604b2b105da9539376e24fc0a3b0007411ae4fd9",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "indexmap",
+      "version": "2.9.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "cea70ddb795996207ad57735b50c5982d8844f38ba9ee5f1aedcfb708a2aa11e",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "interval-heap",
+      "version": "0.0.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "11274e5e8e89b8607cfedc2910b6626e998779b48a019151c7604d0adcb86ac6",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "itertools",
+      "version": "0.12.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ba291022dbbd398a455acf126c1e341954079855bc60dfdda641363bd6922569",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "use_alloc",
+        "use_std"
+      ]
+    },
+    {
+      "name": "itoa",
+      "version": "1.0.18",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "js-sys",
+      "version": "0.3.105",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ce57d20d1ea864ce2ac172ab472d409214f4fd359f0b2a2775abdf522e2af99e",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "k256",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "93f50113171a713f4a4231ef82eb26703607139b35dcb56241f0ceab2ae1f7d8",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "arithmetic",
+        "digest",
+        "ecdsa",
+        "ecdsa-core",
+        "getrandom",
+        "schnorr",
+        "sha2",
+        "sha256",
+        "signature",
+        "std"
+      ]
+    },
+    {
+      "name": "libc",
+      "version": "0.2.185",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "52ff2c0fe9bc6cb6b14a0592c2ff4fa9ceb83eea9db979b0487cd054946a2b8f",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "linux-raw-sys",
+      "version": "0.12.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "auxvec",
+        "elf",
+        "errno",
+        "general",
+        "ioctl",
+        "no_std"
+      ]
+    },
+    {
+      "name": "lock_api",
+      "version": "0.4.13",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "96936507f153605bddfcda068dd804796c84324ed2510809e5b2a624c81da765",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "atomic_usize",
+        "default"
+      ]
+    },
+    {
+      "name": "log",
+      "version": "0.4.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "lsm-tree",
+      "version": "3.1.10",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5498808f4d41cf785079d3ef3f28716f1b4364af1b512f3097bfb651bded1b3e",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "memchr",
+      "version": "2.7.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "32a282da65faaf38286cf3be983213fcf1d2e2a58700e808f83f4ea9a4804bc0",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "munge",
+      "version": "0.4.7",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5e17401f259eba956ca16491461b6e8f72913a0a114e39736ce404410f915a0c",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "munge_macro",
+      "version": "0.4.7",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "4568f25ccbd45ab5d5603dc34318c1ec56b117531781260002151b8530a9f931",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "num-traits",
+      "version": "0.2.19",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "071dfc062690e90b734c0b2273ce72ad0ffa95f0c74596bc250dcfd960262841",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "num_cpus",
+      "version": "1.17.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "91df4bbde75afed763b708b7eee1e8e7651e02d97f6d5dd763e89367e957b23b",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "once_cell",
+      "version": "1.21.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "race",
+        "std"
+      ]
+    },
+    {
+      "name": "openssl",
+      "version": "0.10.81",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "77823a27f0babb03091cb9ed9ef80af3b39dbc82f97e8fa530374b7dafd87a45",
+      "overlap": "distinct-name",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "openssl-macros",
+      "version": "0.1.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a948666b637a0f465e8564c73e89d4dde00d72d4d473cc972f390fc3dcee7d9c",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "openssl-sys",
+      "version": "0.9.117",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b47e7e6bb2c38cd930d25a23b40fa52e068c10e85f3e03a7f5ba5aaca5713695",
+      "overlap": "distinct-name",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "parity-scale-codec",
+      "version": "3.7.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "799781ae679d79a948e13d4824a40970bfa500058d245760dd857301059810fa",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "derive",
+        "parity-scale-codec-derive"
+      ]
+    },
+    {
+      "name": "parity-scale-codec-derive",
+      "version": "3.7.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "34b4653168b563151153c9e4c08ebed57fb8262bebfa79711552fa983c623e7a",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "parking_lot",
+      "version": "0.12.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "70d58bf43669b5795d1576d0641cfb6fbb2057bf629506267a92807158584a13",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "parking_lot_core",
+      "version": "0.9.11",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "bc838d2a56b5b1a6c25f55575dfc605fabb63bb2365f6c2353ef9159aa69e4a5",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "pin-project-lite",
+      "version": "0.2.16",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "3b3cff922bd51709b605d9ead9aa71031d81447142d828eb4a6eba76fe619f9b",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "pkcs8",
+      "version": "0.11.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "451913da69c775a56034ea8d9003d27ee8948e12443eae7c038ba100a4f21cb7",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "pkg-config",
+      "version": "0.3.34",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f6b464fbc74e149a392436b17d523f769e057cb6877f6a5c4618bc6f11800548",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "ppv-lite86",
+      "version": "0.2.21",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "85eae3c4ed2f50dcfe72643da4befc30deadb458a9b590d720cde2f2b1e97da9",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "simd",
+        "std"
+      ]
+    },
+    {
+      "name": "primefield",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "c555a6e4eb7d4e158fcb028c835c3b8642206ddc279b5c6b202ef9a8bdb592f4",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "primeorder",
+      "version": "0.14.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5c9f42978c78a00e3d68f69fc03e57a234debae69da4020a4fb588fcdcd07b06",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "proc-macro-crate",
+      "version": "3.3.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "edce586971a4dfaa28950c6f18ed55e0406c1ab88bbce2c6f6293a7aaba73d35",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "proc-macro2",
+      "version": "1.0.95",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "02b3e5e68a3a1a02aad3ec490a98007cbc13c37cbe84a3cd7b8e406d76e7f778",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "ptr_meta",
+      "version": "0.3.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "743da816b98c921cdbe8628ef7381b76f25ecf4da599fc80aca90eae7ef70cc0",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "derive",
+        "ptr_meta_derive",
+        "std"
+      ]
+    },
+    {
+      "name": "ptr_meta_derive",
+      "version": "0.3.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1c8d9ca532f185d5d4db7a7c9d51420b452168ea1c2b913953281bd6fe1fcbd0",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "quick_cache",
+      "version": "0.6.24",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b9c6658afe513a3b484e3abfdaa0d03ef3c0bbf017542c178dd55f94eb3051f9",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "quote",
+      "version": "1.0.40",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1885c039570dc00dcb4ff087a89e185fd56bae234ddc7f056a945bf36467248d",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "proc-macro"
+      ]
+    },
+    {
+      "name": "r-efi",
+      "version": "5.3.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "69cdb34c158ceb288df11e18b4bd39de994f6657d83847bdffdbd7f346754b0f",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "r-efi",
+      "version": "6.0.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f8dcc9c7d52a811697d2151c701e0d08956f92b0e24136cf4cf27b57a6a0d9bf",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "rancor",
+      "version": "0.1.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "9b534442d0fcdb55d66f373d9cac6d33b6293a2335bc2136dbd06ce0e87d2572",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "rand",
+      "version": "0.8.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "34af8d1a0e25924bc5b7c43c079c942339d8f0a8b57c39049bef581b46327404",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "getrandom",
+        "libc",
+        "rand_chacha",
+        "std",
+        "std_rng"
+      ]
+    },
+    {
+      "name": "rand_chacha",
+      "version": "0.3.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e6c10a63a0fa32252be49d21e7709d4d4baf8d231c2dbce1eaa8141b9b127d88",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "rand_core",
+      "version": "0.6.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "getrandom",
+        "std"
+      ]
+    },
+    {
+      "name": "rand_core",
+      "version": "0.10.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "redox_syscall",
+      "version": "0.5.13",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "0d04b7d0ee6b4a0207a0a7adb104d23ecb0b47d6beae7152d0fa34b692b29fd6",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "userspace"
+      ]
+    },
+    {
+      "name": "ref-cast",
+      "version": "1.0.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7e440fb4e4b4147295338efb76001ab9e4efc0e5839df2c47fc5ac2381d365c3",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "ref-cast-impl",
+      "version": "1.0.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "92ecd8964f8453721699a1ed72037b0db49ce2f5a5138486ee89bed6f67cdf3a",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "rend",
+      "version": "0.5.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "663ba70707f96e871406fe10d68128412e619b06d1d47cb91c3a4c6501176240",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "rfc6979",
+      "version": "0.6.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b4a459cddafb3fe76b31fd8f1108007566c40301feb64dc7b54656eb7388172b",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "rkyv",
+      "version": "0.8.18",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "d9776093b7ca170454ab1406954f7b7d97a57c51dc6c0642957fb2ef25c2d399",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "rkyv_derive",
+      "version": "0.8.18",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1c25ef604ac7dd839d44d64648952ea23c97866f124ff671b0ed2cf3ad9bb06e",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "rustc-hash",
+      "version": "2.1.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "6b1e7f9a428571be2dc5bc0505c13fb6bf936822b894ec87abf8a08a4e51742d",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "rustix",
+      "version": "1.1.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b6fe4565b9518b83ef4f91bb47ce29620ca828bd32cb7e408f0062e9930ba190",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "fs",
+        "std"
+      ]
+    },
+    {
+      "name": "rustversion",
+      "version": "1.0.22",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "scopeguard",
+      "version": "1.2.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "sec1",
+      "version": "0.8.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "d56d437c2f19203ce5f7122e507831de96f3d2d4d3be5af44a0b0a09d8a80e4d",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "ctutils",
+        "default",
+        "der",
+        "point",
+        "std",
+        "subtle",
+        "zeroize"
+      ]
+    },
+    {
+      "name": "self_cell",
+      "version": "1.3.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "2ab42ca02749e120097e328d91d415325bdf43b1c72c4c8badf37375fe40a813",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "serde",
+      "version": "1.0.229",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "derive",
+        "rc",
+        "serde_derive",
+        "std"
+      ]
+    },
+    {
+      "name": "serde_core",
+      "version": "1.0.229",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "rc",
+        "result",
+        "std"
+      ]
+    },
+    {
+      "name": "serde_derive",
+      "version": "1.0.229",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "serdect",
+      "version": "0.4.3",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "66cf8fedced2fcf12406bcb34223dffb92eaf34908ede12fed414c82b7f00b3e",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc"
+      ]
+    },
+    {
+      "name": "sfa",
+      "version": "1.0.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a1296838937cab56cd6c4eeeb8718ec777383700c33f060e2869867bd01d1175",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "sha2",
+      "version": "0.11.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "446ba717509524cb3f22f17ecc096f10f4822d76ab5c0b9822c5f9c284e825f4",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "shlex",
+      "version": "2.0.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "signal-hook",
+      "version": "0.4.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b2a0c28ca5908dbdbcd52e6fdaa00358ab88637f8ab33e1f188dd510eb44b53d",
+      "overlap": "distinct-name",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "signal-hook-registry",
+      "version": "1.4.8",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "c4db69cba1110affc0e9f7bcd48bbf87b3f4fc7c61fc9155afd4c469eb3d6c1b",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "signature",
+      "version": "3.0.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "28d567dcbaf0049cb8ac2608a76cd95ff9e4412e1899d389ee400918ca7537f5",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "digest",
+        "rand_core"
+      ]
+    },
+    {
+      "name": "simdutf8",
+      "version": "0.1.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e3a9fe34e3e7a50316060351f37187a3f546bce95496156754b601a5fa71b76e",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "aarch64_neon",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "slab",
+      "version": "0.4.11",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "7a2ae44ef20feb57a68b23d846850f861394c2e02dc425a50098ae8c90267589",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "smallvec",
+      "version": "1.15.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "sonic-number",
+      "version": "0.1.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "3775c3390edf958191f1ab1e8c5c188907feebd0f3ce1604cb621f72961dbf32",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "sonic-rs",
+      "version": "0.5.8",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "d971cc77a245ccf1756dbd1a87c3e7f709c0191464096510d43eec056d0f2c4f",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "sonic-simd",
+      "version": "0.1.4",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f99e664ecd2d85a68c87e3c7a3cfe691f647ea9e835de984aba4d54a41f817d4",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "spin",
+      "version": "0.9.9",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "3763264f6b73151db08c50ff20d7d8a0b8796e021cdea7ceedad07b80155fa0e",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "barrier",
+        "default",
+        "lazy",
+        "lock_api",
+        "lock_api_crate",
+        "mutex",
+        "once",
+        "rwlock",
+        "spin_mutex"
+      ]
+    },
+    {
+      "name": "spki",
+      "version": "0.8.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1d9efca8738c78ee9484207732f728b1ef517bbb1833d6fc0879ca898a522f6f",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "std"
+      ]
+    },
+    {
+      "name": "subtle",
+      "version": "2.6.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "13c2bddecc57b384dee18652358fb23172facb8a2c51ccc10d74c157bdea3292",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "const-generics",
+        "i128"
+      ]
+    },
+    {
+      "name": "syn",
+      "version": "1.0.109",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "72b64191b275b66ffe2469e8af2c1cfe3bafa67b529ead792a6d0160888b4237",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "clone-impls",
+        "default",
+        "derive",
+        "extra-traits",
+        "parsing",
+        "printing",
+        "proc-macro",
+        "quote",
+        "visit"
+      ]
+    },
+    {
+      "name": "syn",
+      "version": "2.0.104",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "17b6f705963418cdb9927482fa304bc562ece2fdd4f616084c50b7023b435a40",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "clone-impls",
+        "default",
+        "derive",
+        "extra-traits",
+        "fold",
+        "full",
+        "parsing",
+        "printing",
+        "proc-macro",
+        "visit",
+        "visit-mut"
+      ]
+    },
+    {
+      "name": "syn",
+      "version": "3.0.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "12df2e0110f65b775f769bb17ef989067a1d931b2eb822bd4346631eeada89f9",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "clone-impls",
+        "default",
+        "derive",
+        "extra-traits",
+        "full",
+        "parsing",
+        "printing",
+        "proc-macro",
+        "visit",
+        "visit-mut"
+      ]
+    },
+    {
+      "name": "tempfile",
+      "version": "3.27.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "32497e9a4c7b38532efcdebeef879707aa9f794296a4f0244f6f69e9bc8574bd",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "getrandom"
+      ]
+    },
+    {
+      "name": "thiserror",
+      "version": "1.0.69",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "thiserror",
+      "version": "2.0.20",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ec86235f5fcc2a73650310756d2ac5b138a5780bbbdfae3eeccec992c435ba4f",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "thiserror-impl",
+      "version": "1.0.69",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "thiserror-impl",
+      "version": "2.0.20",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "bc04cd3e1236dd4a98afca4569f2deb3f120e5422a4023be2cb683f8486292af",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "threadpool",
+      "version": "1.8.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "d050e60b33d41c19108b32cea32164033a9013fe3b46cbd4457559bfbf77afaa",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "tinyvec",
+      "version": "1.13.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "4cf0ded5c4e56918d8f8a339e1bb67d038d3bc6d144ac407904015ba2e4cde9b",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "tinyvec_macros"
+      ]
+    },
+    {
+      "name": "tinyvec_macros",
+      "version": "0.1.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "toml_datetime",
+      "version": "0.6.11",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "22cddaf88f4fbc13c51aebbf5f8eceb5c7c5a9da2ac40a13519eb5b0a0e8f11c",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "toml_edit",
+      "version": "0.22.27",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "41fe8c660ae4257887cf66394862d21dbca4a6ddd26f04a3560410406a2f819a",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "parse"
+      ]
+    },
+    {
+      "name": "typenum",
+      "version": "1.20.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b6f5e870be6c3b371b77fe0ee0bafb859fa4964b4404c27de1d380043c4dda20",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "const-generics"
+      ]
+    },
+    {
+      "name": "unicode-ident",
+      "version": "1.0.18",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "5a5f39404a5da50712a4c1eecf25e90dd62b613502b7e925fd4e4d19b5c96512",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "unicode-segmentation",
+      "version": "1.12.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f6ccf251212114b54433ec949fd6a7841275f9ada20dddd2f29e9ceea4501493",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "unicode-xid",
+      "version": "0.2.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ebc1c04c71510c7f702b52b7c350734c9ff1295c464a03335b00bb84fc54f853",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default"
+      ]
+    },
+    {
+      "name": "uuid",
+      "version": "1.26.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "2ef6dac1e96601b4fb3acccccff2139741fcb757cb9a36089bf5be91cfb285ce",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "varint-rs",
+      "version": "2.2.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "bfa6c38708f6257f1ec2ca7e5a11f9bbf58a27d7060078b6b333624968183d96",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "default",
+        "signed",
+        "std"
+      ]
+    },
+    {
+      "name": "vcpkg",
+      "version": "0.2.15",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "accd4ea62f7bb7a82fe23066fb0957d48ef677f6eeb8215f372f52e48bb32426",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "version_check",
+      "version": "0.9.5",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "0b928f33d975fc6ad9f86c8f283853ad26bdd5b10b7f1542aa2fa15e2289105a",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "wasi",
+      "version": "0.11.1+wasi-snapshot-preview1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ccf3ec651a847eb01de73ccad15eb7d99f80485de043efb2f370cd654f4ea44b",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "wasip2",
+      "version": "1.0.4+wasi-0.2.12",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "b67efb37e106e55ce722a510d6b5f9c17f083e5fc79afc2badeb12cc313d9487",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "wasm-bindgen",
+      "version": "0.2.128",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "aecb87a33d3b0c5e3b7aa46336eaf486cffafbd281b195e4c8b80d50df2351bf",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "std"
+      ]
+    },
+    {
+      "name": "wasm-bindgen-macro",
+      "version": "0.2.128",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "a690d511e3c1a8b3a55e33511e3c2c00c78415cd23650f32b808627f5696b9ed",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "wasm-bindgen-macro-support",
+      "version": "0.2.128",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "411e4887f0071ef2d2164a9d5fdf2d20efbef78fccd3a78b0c10a1dc5295e48a",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "wasm-bindgen-shared",
+      "version": "0.2.128",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "81941cd78d0c92026c33e5e01312845a4cb1e9af3407f9134b100dd03144103e",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows-link",
+      "version": "0.2.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "f0805222e57f7521d6a62e36fa9163bc891acd422f971defe97d64e70d0a4fe5",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows-sys",
+      "version": "0.61.2",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "ae137229bcbd6cdf0f7b80a31df61766145077ddf49416a728b02cb3921ff3fc",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "Win32",
+        "Win32_Foundation",
+        "Win32_Networking",
+        "Win32_Networking_WinSock",
+        "Win32_Storage",
+        "Win32_Storage_FileSystem",
+        "Win32_System",
+        "Win32_System_Diagnostics",
+        "Win32_System_Diagnostics_Debug",
+        "default"
+      ]
+    },
+    {
+      "name": "windows-targets",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "9b724f72796e036ab90c1021d4780d4d3d648aca59e491e6b98e725b84e99973",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_aarch64_gnullvm",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "32a4622180e7a0ec044bb555404c800bc9fd9ec262ec147edd5989ccd0c02cd3",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_aarch64_msvc",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "09ec2a7bb152e2252b53fa7803150007879548bc709c039df7627cabbd05d469",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_i686_gnu",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "8e9b5ad5ab802e97eb8e295ac6720e509ee4c243f69d781394014ebfe8bbfa0b",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_i686_gnullvm",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "0eee52d38c090b3caa76c563b86c3a4bd71ef1a819287c19d586d7334ae8ed66",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_i686_msvc",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "240948bc05c5e7c6dabba28bf89d89ffce3e303022809e73deaefe4f6ec56c66",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_x86_64_gnu",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "147a5c80aabfbf0c7d901cb5895d1de30ef2907eb21fbbab29ca94c5b08b1a78",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_x86_64_gnullvm",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "24d5b23dc417412679681396f2b49f3de8c1473deb516bd34410872eff51ed0d",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "windows_x86_64_msvc",
+      "version": "0.52.6",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "589f6da84c646204747d1270a2a5661ea66ed1cced2631d546fdfb155959f9ec",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "winnow",
+      "version": "0.7.11",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "74c7b26e3480b707944fc872477815d29a8e429d2f93a1ce000f5fa84a15cbcd",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "std"
+      ]
+    },
+    {
+      "name": "wit-bindgen",
+      "version": "0.57.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1ebf944e87a7c253233ad6766e082e3cd714b5d03812acc24c318f549614536e",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "wnaf",
+      "version": "0.14.1",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "795ca18b3fdb5e62bf982199278341ddcf7ebf7d32e25e212ad05d496e95f6fa",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": []
+    },
+    {
+      "name": "xxhash-rust",
+      "version": "0.8.18",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "aee1b19627c7c60102ab80d3a9cbe18de90bfe03bfa6c3715447681f0e8c8af6",
+      "overlap": "distinct-name",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "xxh3"
+      ]
+    },
+    {
+      "name": "zerocopy",
+      "version": "0.8.26",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "1039dd0d3c310cf05de012d8a39ff557cb0d23087fd44cad61df08fc31907a2f",
+      "overlap": "required-agreement",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": [
+        "simd"
+      ]
+    },
+    {
+      "name": "zerocopy-derive",
+      "version": "0.8.26",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "9ecf5b4cc5364572d7f4c329661bcc82724222973f2cab6f050a4e5c22f75181",
+      "overlap": "required-agreement",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "zeroize",
+      "version": "1.9.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "e13c156562582aa81c60cb29407084cdb54c4164760106ab78e6c5b0858cf64e",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": false,
+      "features": [
+        "alloc",
+        "default",
+        "zeroize_derive"
+      ]
+    },
+    {
+      "name": "zeroize_derive",
+      "version": "1.5.0",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "3c50655cbb0fe3fc43170059e702f1ce5e19b84cec58dc87b037a09935c2f328",
+      "overlap": "shared-other",
+      "build_script": false,
+      "procedural_macro": true,
+      "features": []
+    },
+    {
+      "name": "zmij",
+      "version": "1.0.23",
+      "source": "registry+https://github.com/rust-lang/crates.io-index",
+      "checksum": "29666d0abbfad1e3dc4dcf6144730dd3a3ab225bbbdac83319345b1b44ccfc1b",
+      "overlap": "shared-other",
+      "build_script": true,
+      "procedural_macro": false,
+      "features": []
+    }
+  ],
+  "errors": []
+}

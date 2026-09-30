@@ -1,0 +1,32 @@
+{
+  "scope": "Pending mixed consolidation accepted by Core mempool, not yet confirmation",
+  "txid": "772ce84e635f9c0c55ee91d810188cb63dbb53d130452e815482e0747beaf811",
+  "input_sat": 200000,
+  "output_sat": 199368,
+  "actual_fee_sat": 632,
+  "core_weight": 1261,
+  "core_vsize": 316,
+  "stored_vbytes": 316,
+  "client_note_count_by_denomination": {
+    "10": 4,
+    "11": 3,
+    "12": 4,
+    "13": 5,
+    "14": 3,
+    "15": 5,
+    "16": 3,
+    "17": 5,
+    "18": 3,
+    "19": 5,
+    "20": 3,
+    "21": 5,
+    "22": 5,
+    "23": 5,
+    "24": 3,
+    "25": 2,
+    "9": 3
+  },
+  "client_note_count": 66,
+  "client_note_value_msat": 198528512,
+  "client_inventory_scope": "CLI denomination-count report; note signatures not independently verified"
+}

@@ -1,0 +1,14 @@
+[
+  {
+    "source": "funding-0-wallet.json",
+    "source_sha256": "4b368b82c390f3786d6cdc197c428279b5603ea0598ffc2b8c27eff79a748274",
+    "txid": "5af7cdfcdb6a33de692e44846afaa0ee0474f8c04f8049bc24654b3848897c6b",
+    "fee_btc": -1.414e-05
+  },
+  {
+    "source": "funding-1-wallet.json",
+    "source_sha256": "4502c140ed833092bb9b22375c2ca35de79fd81140be12a82b1986d1e679c77d",
+    "txid": "a94a5284d700144f5a1b3eb7a9a357f28fc3207ce11d12d9d332a52f68e32950",
+    "fee_btc": -4.24e-06
+  }
+]

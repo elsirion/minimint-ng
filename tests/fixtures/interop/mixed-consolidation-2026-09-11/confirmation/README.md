@@ -1,0 +1,3 @@
+# Subsequent Core-only confirmation
+
+Root mined exactly one reserved block after the federation guardians stopped, without additional funding. Core advanced149 to150 and reports the previously captured consolidation with one confirmation and the same txid/wtxid. These later captures do not establish a guardian scan, federation-side pending-chain cleanup, six-block burial, or successful reissuance. They are kept separate from the earlier mempool snapshot. Public evidence copied from /tmp/minimint-consolidation-confirm-20260911; mining address file excluded as unnecessary. No live action was performed to preserve these files.

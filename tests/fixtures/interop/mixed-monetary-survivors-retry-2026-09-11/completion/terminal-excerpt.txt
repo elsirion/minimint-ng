@@ -1,0 +1,8 @@
+mixed external driver active; guardians healthy elapsed=1196.866458772s
+mixed external driver active; guardians healthy elapsed=1211.881395655s
+mixed external driver exited successfully; independently verified 6 matching signed sessions; external claims retained privately
+mixed external-driver guardians joined; exit codes=[0, 0, 255, 255]; reference255 is observed only
+test two_independent_two_reference_fresh_setup_and_empty_history ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 8 filtered out; finished in 1219.20s
+

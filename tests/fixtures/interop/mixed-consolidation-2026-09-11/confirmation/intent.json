@@ -1,0 +1,1 @@
+{"schema": 1, "purpose": "Confirm already captured consolidation and refresh real regtest tip", "max_blocks": 1, "additional_funding_sat": 0, "expected_txids": ["772ce84e635f9c0c55ee91d810188cb63dbb53d130452e815482e0747beaf811"], "before_height": 149, "mined_blocks_in_prior_driver": 14, "total_with_this_reservation": 15}

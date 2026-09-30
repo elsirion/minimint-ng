@@ -1,0 +1,135 @@
+[
+  {
+    "name": "getrandom",
+    "version": "0.4.3",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "300e883d756b2e4ec94e02791f39b04b522276138852cfc41d9fb7e904106099",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "hashbrown",
+    "version": "0.14.5",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "hashbrown",
+    "version": "0.16.1",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "once_cell",
+    "version": "1.21.4",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "9f7c3e4beb33f85d45ae3e3a1792185706c8e16d043238c593331cc7cd313b50",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "rand_core",
+    "version": "0.10.1",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "63b8176103e19a2643978565ca18b50549f6101881c443590420e4dc998a3c69",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "serde",
+    "version": "1.0.229",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "serde_core",
+    "version": "1.0.229",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "67dca2c9c51e58a4791a4b1ed58308b39c64224d349a935ab5039aa360942a48",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "serde_derive",
+    "version": "1.0.229",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "syn",
+    "version": "3.0.5",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "12df2e0110f65b775f769bb17ef989067a1d931b2eb822bd4346631eeada89f9",
+    "reason": "Separate ordinary crypto/storage library resolution; absent from active Aleph closure. Shared package lineage remains a correlated risk; see docs/dependency-review.md."
+  },
+  {
+    "name": "bumpalo",
+    "version": "3.20.3",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "72f5acc6cb2ba439de613abc23857ec3d78374d8ed5ac84e9d11336e87da8649",
+    "reason": "Sonic JSON arena allocator on the host; ordinary parser memory-safety and resource-exhaustion exposure. Separate version outside active Aleph closure."
+  },
+  {
+    "name": "getrandom",
+    "version": "0.3.4",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "899def5c37c4fd7b2664648c28120ecec138e4d395b459e5ca34f9cce2dd77fd",
+    "reason": "ahash randomized hashing through Sonic; host OS randomness for hash tables, not guardian key generation. Separate version outside active Aleph closure."
+  },
+  {
+    "name": "hashbrown",
+    "version": "0.17.1",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "ed5909b6e89a2db4456e54cd5f673791d7eca6732202bbf2a9cc504fe2f9b84a",
+    "reason": "Optional lockfile resolution introduced through the JSON graph; cargo tree --target all reports no active reverse dependency for hashbrown 0.17.1 / wasm-bindgen 0.2.128. Not enabled in this guardian profile. Retained exact identity reviewed outside active Aleph closure; activation requires renewed feature/build risk review."
+  },
+  {
+    "name": "js-sys",
+    "version": "0.3.105",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "ce57d20d1ea864ce2ac172ab472d409214f4fd359f0b2a2775abdf522e2af99e",
+    "reason": "Optional lockfile resolution introduced through the JSON graph; cargo tree --target all reports no active reverse dependency for hashbrown 0.17.1 / wasm-bindgen 0.2.128. Not enabled in this guardian profile. Retained exact identity reviewed outside active Aleph closure; activation requires renewed feature/build risk review."
+  },
+  {
+    "name": "thiserror",
+    "version": "2.0.20",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "ec86235f5fcc2a73650310756d2ac5b138a5780bbbdfae3eeccec992c435ba4f",
+    "reason": "Sonic error representation; host code-generation dependency, correlated build compromise risk. Separate version outside active Aleph closure."
+  },
+  {
+    "name": "thiserror-impl",
+    "version": "2.0.20",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "bc04cd3e1236dd4a98afca4569f2deb3f120e5422a4023be2cb683f8486292af",
+    "reason": "Sonic error procedural macro executes at build time; critical if build supply chain compromised. Separate version outside active Aleph closure."
+  },
+  {
+    "name": "wasm-bindgen",
+    "version": "0.2.128",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "aecb87a33d3b0c5e3b7aa46336eaf486cffafbd281b195e4c8b80d50df2351bf",
+    "reason": "Optional lockfile resolution introduced through the JSON graph; cargo tree --target all reports no active reverse dependency for hashbrown 0.17.1 / wasm-bindgen 0.2.128. Not enabled in this guardian profile. Retained exact identity reviewed outside active Aleph closure; activation requires renewed feature/build risk review."
+  },
+  {
+    "name": "wasm-bindgen-macro",
+    "version": "0.2.128",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "a690d511e3c1a8b3a55e33511e3c2c00c78415cd23650f32b808627f5696b9ed",
+    "reason": "Optional lockfile resolution introduced through the JSON graph; cargo tree --target all reports no active reverse dependency for hashbrown 0.17.1 / wasm-bindgen 0.2.128. Not enabled in this guardian profile. Retained exact identity reviewed outside active Aleph closure; activation requires renewed feature/build risk review."
+  },
+  {
+    "name": "wasm-bindgen-macro-support",
+    "version": "0.2.128",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "411e4887f0071ef2d2164a9d5fdf2d20efbef78fccd3a78b0c10a1dc5295e48a",
+    "reason": "Optional lockfile resolution introduced through the JSON graph; cargo tree --target all reports no active reverse dependency for hashbrown 0.17.1 / wasm-bindgen 0.2.128. Not enabled in this guardian profile. Retained exact identity reviewed outside active Aleph closure; activation requires renewed feature/build risk review."
+  },
+  {
+    "name": "wasm-bindgen-shared",
+    "version": "0.2.128",
+    "source": "registry+https://github.com/rust-lang/crates.io-index",
+    "checksum": "81941cd78d0c92026c33e5e01312845a4cb1e9af3407f9134b100dd03144103e",
+    "reason": "Optional lockfile resolution introduced through the JSON graph; cargo tree --target all reports no active reverse dependency for hashbrown 0.17.1 / wasm-bindgen 0.2.128. Not enabled in this guardian profile. Retained exact identity reviewed outside active Aleph closure; activation requires renewed feature/build risk review."
+  }
+]

@@ -1,0 +1,16 @@
+{
+  "spec_revision": "06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c",
+  "capture_directory": "/tmp/minimint-mixed-evidence-163238-1789044191065483656",
+  "scope": "Public configuration and signed empty-transaction/Wallet-observation history; no monetary workflow or secret material.",
+  "sha256": {
+    "artifacts.json": "2ca23aab7cee4625e5de20f8787685828d4f9ac83252cc92197df4d9ec2a9aa6",
+    "federation_id.json": "18e57cd49ea60c83e45727799f0ffb70f3bfef37a5ae6bcc4c2a8bda36a25f0c",
+    "server_config_consensus_hash.json": "3293ba464a7c95e436fa0fa07ca02e44d8b4af5bb90b6036df0a36d61375968f",
+    "sigterm-exits.json": "4aa8751a1a2a909a3f984a91a54730bea3b4bedf079a0f5c1c8c61f745fae76c",
+    "peer0-client_config.json": "fb7f05fe67360b1dd73b8a713eb020bb79d9ff0b7d157e5be4a5ca23054eb8cb",
+    "peer0-signed-session0.json": "8aff3210209e220312541bb02c5157b5f67ab45fa010819f4ab15318cb426d50",
+    "peer1-signed-session0.json": "dc6bfb74b4d4028fb1e9c4d32040bd53b9b6665c65f956d145952519c6a3c2fd",
+    "peer2-signed-session0.json": "dc6bfb74b4d4028fb1e9c4d32040bd53b9b6665c65f956d145952519c6a3c2fd",
+    "peer3-signed-session0.json": "dc6bfb74b4d4028fb1e9c4d32040bd53b9b6665c65f956d145952519c6a3c2fd"
+  }
+}

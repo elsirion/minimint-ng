@@ -1,0 +1,27 @@
+SOURCE: manually transcribed exact `output` string of tools.write_stdin(session_id=64394) terminal response, chunk_id ac183e, exit_code=0. This is retained tool observation, not a recovered original evidence file.
+--- BEGIN EXACT TOOL OUTPUT ---
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running tests/wallet_live.rs (target/debug/deps/wallet_live-def72b9791e8100f)
+
+running 1 test
+test wallet_live_accepts_threshold_consolidation_and_withdrawal ... public evidence: /tmp/nix-shell-235174-1486709421/minimint-wallet-live-235232-1789051336104225610
+
+running 1 test
+passed
+consolidation=54fbc5d65193e59d2cab948470dd3ba1c880c1401eb878886db84d32bbf544a0
+withdrawal=e10abaf7b1c9413a5e605e0063c0eacfba906598f8d755118040241849c4ab36
+actual_fee_sat=2926
+funded_sat=200000
+mined_blocks=21
+final_wallet_sat=148912
+
+test wallet_live_child ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.81s
+
+kill: ‘-235234’: No such process
+ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 2 filtered out; finished in 0.85s
+
+--- END EXACT TOOL OUTPUT ---

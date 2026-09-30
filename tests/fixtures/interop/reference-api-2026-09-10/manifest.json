@@ -1,0 +1,31 @@
+{
+  "reference_revision": "0c316439d60b5a08eea26fab216780eb893c45bf",
+  "reference_sha256": "d51bc18b275ac699c2d20e3ca905bc38f20afdf6b704c14b0524f9eaa20ae8b8",
+  "scope": "Read-only public RPC observations during controlled mixed failure run; not a complete normative schema.",
+  "requests": {
+    "chain_id": null,
+    "client_config_json": null,
+    "session_status": [
+      1,
+      9
+    ],
+    "signed_session_status": [
+      1,
+      9
+    ]
+  },
+  "sha256": {
+    "peer2-chain_id-None.json": "0f34e6a8afe0c4a0a472976b0672c3ceeb5082188d998ff1a7b73c9253e7f7ec",
+    "peer2-client_config_json-None.json": "f4bba2a58bfe45cb9d66a070aa28f4d4e798a4fc70f19fdd23937f2132875df1",
+    "peer2-session_status-1.json": "6b28988b6b03349898dbcd6b250697edddb36e8d3366e8c8d1931985d4c5efe2",
+    "peer2-session_status-9.json": "6b28988b6b03349898dbcd6b250697edddb36e8d3366e8c8d1931985d4c5efe2",
+    "peer2-signed_session_status-1.json": "2d1a3c786ddffe0f8789741910cb2525d6a4ab48c9a10db4fb9e29e50f5025aa",
+    "peer2-signed_session_status-9.json": "2d1a3c786ddffe0f8789741910cb2525d6a4ab48c9a10db4fb9e29e50f5025aa",
+    "peer3-chain_id-None.json": "0f34e6a8afe0c4a0a472976b0672c3ceeb5082188d998ff1a7b73c9253e7f7ec",
+    "peer3-client_config_json-None.json": "f4bba2a58bfe45cb9d66a070aa28f4d4e798a4fc70f19fdd23937f2132875df1",
+    "peer3-session_status-1.json": "6b28988b6b03349898dbcd6b250697edddb36e8d3366e8c8d1931985d4c5efe2",
+    "peer3-session_status-9.json": "6b28988b6b03349898dbcd6b250697edddb36e8d3366e8c8d1931985d4c5efe2",
+    "peer3-signed_session_status-1.json": "2d1a3c786ddffe0f8789741910cb2525d6a4ab48c9a10db4fb9e29e50f5025aa",
+    "peer3-signed_session_status-9.json": "2d1a3c786ddffe0f8789741910cb2525d6a4ab48c9a10db4fb9e29e50f5025aa"
+  }
+}

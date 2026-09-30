@@ -1,0 +1,22 @@
+{
+  "spec_revision": "06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c",
+  "scope": "Inverse peer assignment, reference0/1 and independent2/3. Nonmonetary survivor/restart and bounded fresh-work pair barrier; no issuance/withdrawal or monetary suffix claim.",
+  "sha256": {
+    "artifacts.json": "b9c44ff362adc46b357089cae1196dd340ff40435e41e2dcbad2ec718b7da61c",
+    "federation_id.json": "979a0eba518aa60987c13bc43f6aacfb3845ae60692c381b6f3bc7139589b6b0",
+    "server_config_consensus_hash.json": "00a317ce2f70c6a770683038adfde09b92cd7b9ec17437065e632fe5e807d2bb",
+    "sigterm-exits.json": "6ac92c3a6919413ef1742a2c57d32d9e7d29c8b478db513c2c031de1bbc55264",
+    "two-peer-barrier.json": "7c880f5db94b2484fd39a3de741c935474a9d7b03b93eb6a4e38665d46973cd2",
+    "first-outage.json": "02246d3edf832b9630269b8cf167dfe65272f107c7b4cb5f55f4bdbae17a64fe",
+    "rejoined-wallet-block-count.json": "78d3e5492c78ab23687f683f76bd43042e17fa37c59a3e06798a801caeeb59c7",
+    "peer0-client_config.json": "4ff9dea89ee1c3e1df71ab1f877058caee0a9fa92af734af29df74bbe0032b78",
+    "peer0-signed-session0.json": "9ea126efa1a0ae970044cd0bbfa2f540a6411fd6f8ee84c78135560772455fba",
+    "peer0-signed-session1.json": "0ce0b2149276103841c7cb5c754f9d263d7effa78d54bf61c3dff982030ace72",
+    "peer1-signed-session0.json": "9ea126efa1a0ae970044cd0bbfa2f540a6411fd6f8ee84c78135560772455fba",
+    "peer1-signed-session1.json": "7d6d790290624d5a984ccec73ec94a2ed61489fe0a7972ac1028b66ada1228b3",
+    "peer2-signed-session0.json": "9ea126efa1a0ae970044cd0bbfa2f540a6411fd6f8ee84c78135560772455fba",
+    "peer2-signed-session1.json": "7d6d790290624d5a984ccec73ec94a2ed61489fe0a7972ac1028b66ada1228b3",
+    "peer3-signed-session0.json": "9ea126efa1a0ae970044cd0bbfa2f540a6411fd6f8ee84c78135560772455fba",
+    "peer3-signed-session1.json": "7d6d790290624d5a984ccec73ec94a2ed61489fe0a7972ac1028b66ada1228b3"
+  }
+}

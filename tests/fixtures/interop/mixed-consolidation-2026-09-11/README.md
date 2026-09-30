@@ -1,0 +1,7 @@
+# Mixed consolidation capture
+
+Read-only capture on 2026-09-11 from new peers0/1 and pinned reference peers2/3 in the same federation as mixed-first-deposit-2026-09-11. All four agree on claimed discoveries, populated Wallet199368sat and sole pending consolidation, with Bitcoin outpoint strings. The public chain record input100000sat is the prior Wallet, not both Bitcoin inputs. created144 is the consensus block count. Core mempool confirms the actual signed two-input transaction, one199368sat output and632sat fee; fee was independently summed from the two retained funding outputs. Funding rawhex extracted only from public signed transaction result fields, with no signing secrets. No mining/broadcast/daemon or driver mutation was performed for capture.
+
+This is actual mixed Wallet signature assembly and Core admission evidence, but not consolidation confirmation, general withdrawal/reissuance/restart completion, or independent verification of Mint note signatures. Captured CLI denomination counts are a public inventory report. Artifacts and federation identity are preserved in the adjacent mixed-first-deposit-2026-09-11 fixture.
+
+Subsequent evidence in `confirmation/` records one Core confirmation at height150 after guardian stop. It does not establish federation-side confirmation scanning or pending-chain cleanup; the original mempool capture and test retain their earlier scope.

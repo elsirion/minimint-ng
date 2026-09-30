@@ -1,0 +1,14 @@
+{
+  "spec_revision": "06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c",
+  "scope": "Public nonmonetary mixed survivor-set and restart evidence",
+  "sha256": {
+    "artifacts.json": "93a210e45434f6beb5fab67cf4eb68ba3c32d9589d8f2b964017a31527492ef8",
+    "first-outage.json": "f0674ab4acbed343688d842a336f2d547a4d2246e87ee3b0880f77ac75baf5cf",
+    "sigterm-exits.json": "4aa8751a1a2a909a3f984a91a54730bea3b4bedf079a0f5c1c8c61f745fae76c",
+    "peer0-client_config.json": "ba5b9a9dec8749d5288377ee8def1e74995b2629d979d2a52ee680ffe25ffeb3",
+    "peer0-signed-session0.json": "a7cd767fcc70b90bfcb62556e3a08afb7e9668dc1f05bd3df0f78cba620a863d",
+    "peer1-signed-session0.json": "a7cd767fcc70b90bfcb62556e3a08afb7e9668dc1f05bd3df0f78cba620a863d",
+    "peer2-signed-session0.json": "a7cd767fcc70b90bfcb62556e3a08afb7e9668dc1f05bd3df0f78cba620a863d",
+    "peer3-signed-session0.json": "a7cd767fcc70b90bfcb62556e3a08afb7e9668dc1f05bd3df0f78cba620a863d"
+  }
+}

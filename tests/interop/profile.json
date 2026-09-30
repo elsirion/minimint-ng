@@ -1,0 +1,262 @@
+{
+  "profile_version": 1,
+  "spec_revision": "06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c",
+  "reference_revision": "0c316439d60b5a08eea26fab216780eb893c45bf",
+  "reference_artifact": {
+    "artifact_status": "built-and-version-hash-verified",
+    "path": "/tmp/minimint-upstream-build.2Clk9R/checkout/target-nix/release/fedimintd",
+    "source_repository": "https://github.com/fedimint/fedimint.git",
+    "source_revision": "0c316439d60b5a08eea26fab216780eb893c45bf",
+    "sha256": "d51bc18b275ac699c2d20e3ca905bc38f20afdf6b704c14b0524f9eaa20ae8b8",
+    "version_hash": "0c316439d60b5a08eea26fab216780eb893c45bf",
+    "cargo_lock_sha256": "78d538f1d031156de1ac74039467e93fad52fe3558da1437bab1b253fd3dbf72",
+    "flake_lock_sha256": "fb4553899cb56f234b3cf639855d9e7c90ec1bf7f9961c19b16a58393167dba5",
+    "build_command": "nix develop -c cargo build --locked --release --bin fedimintd",
+    "build_exit_code": 0,
+    "platform": "Linux x86_64",
+    "nix_version": "2.34.8",
+    "artifact_bytes": 148072425,
+    "tracked_checkout_clean_before_and_after": true,
+    "help_capture": "docs/interop/reference-help.txt",
+    "private_build_directory": "/tmp/minimint-upstream-build.2Clk9R",
+    "verified_on": "2026-09-10"
+  },
+  "external_transaction_driver": {
+    "path": "tests/interop/monetary_driver.py",
+    "sha256": "a58a5fe44651c40eb5beac0d59d759468998e0fe70c6fa07a9cb4633308205b1",
+    "status": "implemented-paused-driver; corrected-monetary-survivor-run-independently-verified",
+    "product_scope": "Test-only orchestration of the verified external CLI; no client implementation",
+    "external_cli": {
+      "path": "/tmp/minimint-upstream-build.2Clk9R/checkout/target-nix/release/fedimint-cli",
+      "sha256": "4c93df5a0cd6633ac7add340d7089b712b14b6a48655df89f9bfbb8a2d7eed23",
+      "version_hash": "0c316439d60b5a08eea26fab216780eb893c45bf"
+    },
+    "contract": {
+      "invocation": [
+        "--handoff",
+        "PRIVATE_DIRECTORY"
+      ],
+      "schema": 1,
+      "handoff_file": "handoff.json",
+      "progress_file": "driver-progress.json",
+      "state_file": "driver-state.json",
+      "control_file": "driver-control.json",
+      "result_file": "driver-result.json",
+      "reviewed_resume": {
+        "schema": 1,
+        "action": "resume-reviewed",
+        "script_sha256": "EXACT_REVIEWED_ENTRY_SCRIPT_SHA256"
+      },
+      "finish": {
+        "schema": 1,
+        "action": "finish-diagnostics"
+      },
+      "result_monetary_workflow": false,
+      "session_count_response": {
+        "count": "u64; exactly this field"
+      },
+      "async_reissuance_completion": [
+        "dev",
+        "wait-complete"
+      ],
+      "preconfirmation_client_progress": [
+        "dev",
+        "wait",
+        "5"
+      ],
+      "immutable_resume_bindings": [
+        "federation_id",
+        "original_monotonic_deadline",
+        "linux_boot_id",
+        "entry_script",
+        "monetary_survivors"
+      ],
+      "snapshot_mode": "0400 owner-read-only; not tamper-proof against the owner"
+    },
+    "limits": {
+      "planned_external_funding_sat": 200000,
+      "deposit_count": 2,
+      "deposit_amount_sat": 100000,
+      "external_funding_safety_cap_sat": 1000000,
+      "external_bitcoin_fee_safety_cap_sat": 100000,
+      "healthy_mined_blocks": 21,
+      "survivor_total_mined_blocks": 49,
+      "survivor_original_deadline_secs": 3600,
+      "survivor_case_deadline_secs": 600,
+      "withdrawal_fee_max_sat": 5000
+    },
+    "survivor_mode": {
+      "environment": "MINIMINT_MIXED_MONETARY_SURVIVORS=1",
+      "guardian_requests": [
+        "stop0",
+        "restart0",
+        "stop1",
+        "restart1",
+        "stop2",
+        "restart2",
+        "stop3",
+        "restart3"
+      ],
+      "request_file": "guardian-control.json",
+      "ack_file": "guardian-ack-ID.json",
+      "per_case_export_sat": 5000,
+      "per_case_withdrawal_sat": 10000,
+      "per_case_mined_blocks": 7,
+      "new_bitcoin_deposits": 0,
+      "per_case_gate": "Preserve public evidence and pass the matching mixed_monetary_survivors_capture::survivor_caseN test before the next reviewed resume or finish; the four preserved corrected-run cases are now unignored",
+      "final_phase": "monetary_survivors_observed",
+      "current_run_pass_claim": true,
+      "finish_requires": "All eight guardian requests completed, no peer offline, and all four independent per-case gates passed",
+      "reissuance_match": {
+        "required": "Every exported denomination/signature-SHA256 marker consumed exactly once",
+        "additional_inputs": "Additional valid bounded Mint inputs are permitted; the complete input set need not equal the exported set",
+        "target": "One globally unique Mint reissuance transaction with survivor-only certificate",
+        "bounds": {
+          "mint_inputs_max": 256,
+          "mint_outputs_max": 256
+        },
+        "pitfall": "PIT-035",
+        "prior_partial_case3_restart_proven": false
+      },
+      "capture": {
+        "helper": "tests/interop/capture_survivor.py",
+        "destination_argument": "--destination",
+        "offline_fixture_root_environment": "MINIMINT_SURVIVOR_FIXTURE_ROOT",
+        "requirement": "Use a separate fresh destination for each federation and point every per-case offline gate to that same destination; retain prior partial evidence separately",
+        "default_offline_fixture_root": "tests/fixtures/interop/mixed-monetary-survivors-retry-2026-09-11"
+      },
+      "corrected_run": {
+        "status": "passed-live-run-and-four-independent-offline-gates",
+        "source_evidence_directory": "/tmp/minimint-mixed-evidence-332882-1789135368095578255",
+        "pass_claim": true,
+        "final_driver_phase": "monetary_survivors_observed",
+        "terminal_parent_handle": 12006,
+        "terminal_exit_code": 0,
+        "elapsed_seconds": 1219.2,
+        "guardian_controls_completed": 8,
+        "matching_signed_sessions": 6,
+        "joined_exit_codes": [
+          0,
+          0,
+          255,
+          255
+        ],
+        "reference_exit_scope": "Exit 255 observed on reference shutdown; not described as a clean exit",
+        "all_prior_api_ports_closed": true,
+        "offline_validation": {
+          "handle": 65109,
+          "tests_passed": 4,
+          "tests_failed": 0,
+          "tests_ignored": 0,
+          "elapsed_seconds": 0.44
+        },
+        "fixture_root": "tests/fixtures/interop/mixed-monetary-survivors-retry-2026-09-11",
+        "scope": "D13.4/D13.7 survivor and operator evidence; not full-spec completion",
+        "remaining_definition_gates": 6
+      }
+    }
+  },
+  "network": "regtest",
+  "transport": "tcp-mtls",
+  "api_transport": "websocket",
+  "guardian_count": 4,
+  "fault_bound": 1,
+  "quorum": 3,
+  "setup_participants_required": 4,
+  "normalized_setup_release": "0.13.0",
+  "core_consensus": [
+    2,
+    1
+  ],
+  "core_api": [
+    0,
+    9
+  ],
+  "rounds_per_session": 3600,
+  "round_delay_ms": 50,
+  "disable_base_fees": false,
+  "wallet_send_vbytes": 228,
+  "wallet_receive_vbytes": 316,
+  "modules": [
+    {
+      "id": 0,
+      "kind": "mintv2",
+      "consensus": [
+        1,
+        0
+      ],
+      "api": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": 1,
+      "kind": "walletv2",
+      "consensus": [
+        1,
+        0
+      ],
+      "api": [
+        0,
+        1
+      ]
+    }
+  ],
+  "forbidden_environment": [
+    "FM_IN_DEVIMINT",
+    "NEXTEST",
+    "FM_BACKWARDS_COMPATIBILITY_TEST"
+  ],
+  "guardians": [
+    {
+      "id": 0,
+      "name": "Alice",
+      "implementation": "minimint-ng",
+      "p2p_port": 18173,
+      "api_port": 18174
+    },
+    {
+      "id": 1,
+      "name": "Bob",
+      "implementation": "minimint-ng",
+      "p2p_port": 18273,
+      "api_port": 18274
+    },
+    {
+      "id": 2,
+      "name": "Carol",
+      "implementation": "reference",
+      "p2p_port": 18373,
+      "api_port": 18374
+    },
+    {
+      "id": 3,
+      "name": "Dave",
+      "implementation": "reference",
+      "p2p_port": 18473,
+      "api_port": 18474
+    }
+  ],
+  "bitcoin_core": {
+    "version": "31.1",
+    "platform": "x86_64-linux-gnu",
+    "archive_url": "https://bitcoincore.org/bin/bitcoin-core-31.1/bitcoin-31.1-x86_64-linux-gnu.tar.gz",
+    "archive_sha256": "b80d9c3e04da78fb6f0569685673418cf686fadba9042d926d13fb87ff503f9e",
+    "verified_signer_primary_fingerprint": "E777299FC265DD04793070EB944D35F9AC3DB76A",
+    "signature_scope": "One expected release signer validated; other signatures were not validated because their public keys were not imported.",
+    "bitcoind": {
+      "path": "/tmp/minimint-bitcoin-31.1/bitcoin-31.1/bin/bitcoind",
+      "sha256": "986e63b3c8770f08d0059820ad3dd085d1ab9e1bea23946c243f858a06888a08"
+    },
+    "bitcoin_cli": {
+      "path": "/tmp/minimint-bitcoin-31.1/bitcoin-31.1/bin/bitcoin-cli",
+      "sha256": "4e3a0fde23ec768a61cdd193602be937b29b6e8f21bcb614af87a2786bf86034"
+    },
+    "launcher_prefix": [
+      "/nix/store/n51dhmdbik1kfrsm62j5knavmigwrl1a-glibc-2.42-84/lib/ld-linux-x86-64.so.2"
+    ],
+    "launch_note": "Original verified ELF files are unchanged. This NixOS host requires explicit pinned glibc loader because the archive expects an FHS loader path.",
+    "status": "signature_checksum_verified_and_regtest_rpc_smoke_tested"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "schema": 1,
+  "source_evidence_directory": "/tmp/minimint-mixed-evidence-332882-1789135368095578255",
+  "federation_id": "f604b1ecaa988b5604176958999bd165bb9db5979937a0eabed08c41fc6f3bc2",
+  "spec_revision": "06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c",
+  "reference_revision": "0c316439d60b5a08eea26fab216780eb893c45bf",
+  "driver_sha256": "a58a5fe44651c40eb5beac0d59d759468998e0fe70c6fa07a9cb4633308205b1",
+  "harness_source_sha256": "c507f823cda05f8b0ea1127ae6be56788c09519e5bd6f70c908ed650ba9ecc14",
+  "process_exit_code": 0,
+  "process_duration_seconds": "1219.20",
+  "funded_sat": 200000,
+  "funding_fee_ledger_sat": 662,
+  "mined_blocks_reserved": 49,
+  "joined_exit_codes": [
+    0,
+    0,
+    255,
+    255
+  ],
+  "closed_api_ports": [
+    33497,
+    44339,
+    37695,
+    39201
+  ],
+  "verified_equal_signed_sessions": 6,
+  "completed_survivor_peers": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "individual_offline_gate_seconds": [
+    "0.28",
+    "0.31",
+    "0.37",
+    "0.45"
+  ],
+  "driver_monetary_workflow_claim": false,
+  "reference_exit_255_is_clean_exit_claim": false,
+  "final_wallet_sat": 107087
+}

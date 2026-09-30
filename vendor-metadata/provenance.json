@@ -1,0 +1,7 @@
+{
+  "url": "https://raw.githubusercontent.com/fedimint/fedimint/0c316439d60b5a08eea26fab216780eb893c45bf/Cargo.lock",
+  "baseline": "0c316439d60b5a08eea26fab216780eb893c45bf",
+  "sha256": "78d538f1d031156de1ac74039467e93fad52fe3558da1437bab1b253fd3dbf72",
+  "retrieved": "2026-09-10",
+  "scope": "Lockfile metadata only; no Fedimint implementation source inspected"
+}

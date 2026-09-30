@@ -1,0 +1,32 @@
+{
+  "hash": "773fc5b881eecc3bb46d1afa39c1ae9cb201073d08c32eb2ee4dab1d71808d8e",
+  "confirmations": 7,
+  "height": 143,
+  "version": 536870912,
+  "versionHex": "20000000",
+  "merkleroot": "009cc88d6dd41a75636c5f433ace6ac64fb24e6d810ed61195cb1ddf92857c7e",
+  "time": 1789128634,
+  "mediantime": 1789128053,
+  "nonce": 0,
+  "bits": "207fffff",
+  "target": "7fffff0000000000000000000000000000000000000000000000000000000000",
+  "difficulty": 4.656542373906925e-10,
+  "chainwork": "0000000000000000000000000000000000000000000000000000000000000120",
+  "nTx": 2,
+  "previousblockhash": "392a3f9c00c98a4425297ff83f5867cc38de235a9827a4ad5f1d6baa9f8fdac2",
+  "nextblockhash": "14190c5e620470a7f468c54f333bfb68e28d9999e68fc15b9a58bd017a8e6338",
+  "strippedsize": 351,
+  "size": 496,
+  "weight": 1549,
+  "coinbase_tx": {
+    "version": 2,
+    "locktime": 142,
+    "sequence": 4294967294,
+    "coinbase": "028f0000",
+    "witness": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "tx": [
+    "f4bc346dc51cb2475e1e57a2473d61e6f93a3c5b0a18ed5ed43d6d24c37f5ae3",
+    "e104953b2384b07d4c9f3d98bfa2bff9f5ed19fbca847d177ae9fac5dfccf932"
+  ]
+}

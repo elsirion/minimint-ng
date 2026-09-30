@@ -1,0 +1,28 @@
+[package]
+name = "minimint-ng"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+publish = false
+
+[dependencies]
+# NET-014: exact Fedimint fork; transitive resolution checked against baseline.
+fedimint-aleph-bft = { version = "=0.36.0", default-features = false }
+k256 = { version = "=0.14.0", default-features = false, features = ["std", "arithmetic", "ecdsa", "schnorr"] }
+blst = "=0.3.17"
+openssl = "=0.10.81"
+fjall = { version = "=3.1.10", default-features = false }
+zeroize = "=1.9.0"
+# Public trait adapters for the already mandated Aleph dependency closure.
+futures = "=0.3.32"
+parity-scale-codec = { version = "=3.7.5", default-features = false }
+sonic-rs = { version = "=0.5.8", default-features = false }
+# Safe signal-to-atomic-flag boundary; no iterator/channel features.
+signal-hook = { version = "=0.4.4", default-features = false }
+
+[lints.rust]
+# Only the reviewed raw BLS adapter may locally allow unsafe code.
+unsafe_code = "deny"
+
+[lints.clippy]
+unwrap_used = "warn"

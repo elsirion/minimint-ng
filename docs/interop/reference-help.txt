@@ -1,0 +1,202 @@
+Usage: fedimintd [OPTIONS] --data-dir <DATA_DIR> <--bitcoind-url <BITCOIND_URL>|--esplora-url <ESPLORA_URL>>
+
+Options:
+      --data-dir <DATA_DIR>
+          Path to folder containing federation config files
+
+          [env: FM_DATA_DIR=]
+
+      --password-ui <PASSWORD_UI>
+          Password gating the guardian admin UI on bind-ui. Optional: falls back to reading password.private from data-dir, and if neither is present the UI is served without a login form. Only safe when bind-ui stays on a trusted interface (the default 127.0.0.1)
+
+          [env: FM_PASSWORD_UI=]
+
+      --password-api <PASSWORD_API>
+          Password gating admin RPCs on the public API (WebSocket on bind-api and iroh). Optional and never falls back to disk: when unset, admin RPCs return 401 unconditionally, since the public API is always network-reachable and must be enabled explicitly
+
+          [env: FM_PASSWORD_API=]
+
+      --bitcoin-network <BITCOIN_NETWORK>
+          The bitcoin network of the federation
+
+          [env: FM_BITCOIN_NETWORK=]
+          [default: regtest]
+
+      --bitcoind-username <BITCOIND_USERNAME>
+          The username to use when connecting to bitcoind
+
+          [env: FM_BITCOIND_USERNAME=]
+
+      --bitcoind-password <BITCOIND_PASSWORD>
+          The password to use when connecting to bitcoind
+
+          [env: FM_BITCOIND_PASSWORD=]
+
+      --bitcoind-url <BITCOIND_URL>
+          Bitcoind RPC URL, e.g. <http://127.0.0.1:8332> This should not include authentication parameters, they should be included in `FM_BITCOIND_USERNAME` and `FM_BITCOIND_PASSWORD`
+
+          [env: FM_BITCOIND_URL=]
+
+      --bitcoind-url-password-file <BITCOIND_URL_PASSWORD_FILE>
+          If set, the password part of `--bitcoind-url` will be set/replaced with the content of this file.
+
+          This is useful for setups that provide secret material via ramdisk e.g. SOPS, age, etc.
+
+          Note this is not meant to handle bitcoind's cookie file.
+
+          [env: FM_BITCOIND_URL_PASSWORD_FILE=]
+
+      --esplora-url <ESPLORA_URL>
+          Esplora HTTP base URL, e.g. <https://mempool.space/api>
+
+          [env: FM_ESPLORA_URL=]
+
+      --bind-p2p <BIND_P2P>
+          Address we bind to for p2p consensus communication
+
+          Should be `0.0.0.0:8173` most of the time, as p2p connectivity is public and direct, and the port should be open it in the firewall.
+
+          [env: FM_BIND_P2P=]
+          [default: 0.0.0.0:8173]
+
+      --bind-api <BIND_API>
+          Address we bind to for the API
+
+          Should be `0.0.0.0:8174` most of the time, as api connectivity is public and direct, and the port should be open it in the firewall.
+
+          [env: FM_BIND_API=]
+          [default: 0.0.0.0:8174]
+
+      --bind-ui <BIND_UI>
+          Address we bind to for exposing the Web UI
+
+          Built-in web UI is exposed as an HTTP port, and typically should have TLS terminated by Nginx/Traefik/etc. and forwarded to the locally bind port.
+
+          [env: FM_BIND_UI=]
+          [default: 127.0.0.1:8175]
+
+      --p2p-url <P2P_URL>
+          Our external address for communicating with our peers
+
+          `fedimint://<fqdn>:8173` for TCP/TLS p2p connectivity (legacy/standard).
+
+          Ignored when Iroh stack is used. (newer/experimental)
+
+          [env: FM_P2P_URL=]
+
+      --api-url <API_URL>
+          Our API address for clients to connect to us
+
+          Typically `wss://<fqdn>/ws/` for TCP/TLS connectivity (legacy/standard)
+
+          Ignored when Iroh stack is used. (newer/experimental)
+
+          [env: FM_API_URL=]
+
+      --enable-iroh <ENABLE_IROH>
+          Whether to use the Iroh networking stack instead of the legacy TCP/TLS/websocket stack. Defaults to Iroh in production and to the legacy stack in test environments (`cargo test` / `devimint`). Only consulted at DKG / config generation time; existing federations keep the stack baked into their config. Pass `--enable-iroh true/false` (or `FM_ENABLE_IROH=true/false`) to override
+
+          [env: FM_ENABLE_IROH=]
+          [possible values: true, false]
+
+      --iroh-dns <IROH_DNS>
+          Optional URL of the Iroh DNS server
+
+          [env: FM_IROH_DNS=]
+
+      --iroh-relays <IROH_RELAYS>
+          Optional URLs of the Iroh relays to use for registering
+
+          [env: FM_IROH_RELAY=]
+
+      --iroh-p2p-relays <IROH_P2P_RELAYS>
+          Optional Iroh 1.0 relay URLs to use for guardian P2P
+
+          [env: FM_IROH_P2P_RELAY=]
+
+      --db-checkpoint-retention <DB_CHECKPOINT_RETENTION>
+          Number of checkpoints from the current session to retain on disk
+
+          [env: FM_DB_CHECKPOINT_RETENTION=]
+          [default: 1]
+
+      --session-timeout-secs <SESSION_TIMEOUT_SECS>
+          Exit the process if a consensus session is not completed within this many seconds, relying on the process supervisor to restart fedimintd. Restarting guardians has been observed to resolve stuck sessions
+
+          [env: FM_SESSION_TIMEOUT_SECS=]
+          [default: 3600]
+
+      --p2p-max-connection-age-secs <P2P_MAX_CONNECTION_AGE_SECS>
+          Drop a p2p connection to a peer once it exceeds this age in seconds, relying on the reconnection logic to re-establish it. Unset by default, in which case connections are never dropped due to their age
+
+          [env: FM_P2P_MAX_CONNECTION_AGE_SECS=]
+
+      --bind-tokio-console <BIND_TOKIO_CONSOLE>
+          Enable tokio console logging
+
+          [env: FM_BIND_TOKIO_CONSOLE=]
+
+      --with-jaeger
+          Enable jaeger for tokio console logging
+
+      --bind-metrics <BIND_METRICS>
+          Enable prometheus metrics
+
+          [env: FM_BIND_METRICS=]
+          [default: 127.0.0.1:8176]
+
+      --force-api-secrets <FORCE_API_SECRETS>
+          Comma separated list of API secrets.
+
+          Setting it will enforce API authentication and make the Federation "private".
+
+          The first secret in the list is the "active" one that the peer will use itself to connect to other peers. Any further one is accepted by this peer, e.g. for the purposes of smooth rotation of secret between users.
+
+          Note that the value provided here will override any other settings that the user might want to set via UI at runtime, etc. In the future, managing secrets might be possible via Admin UI and defaults will be provided via `FM_DEFAULT_API_SECRETS`.
+
+          [env: FM_FORCE_API_SECRETS=]
+          [default: ""]
+
+      --iroh-api-max-connections <IROH_API_MAX_CONNECTIONS>
+          Maximum number of concurrent Iroh API connections
+
+          [env: FM_IROH_API_MAX_CONNECTIONS=]
+          [default: 1000]
+
+      --iroh-api-max-requests-per-connection <IROH_API_MAX_REQUESTS_PER_CONNECTION>
+          Maximum number of parallel requests per Iroh API connection
+
+          [env: FM_IROH_API_MAX_REQUESTS_PER_CONNECTION=]
+          [default: 50]
+
+      --enable-iroh-next [<ENABLE_IROH_NEXT>]
+          Enable the transitional Iroh 1.0 API endpoint alongside Iroh 0.35.
+
+          For a federation configured with the legacy Iroh API, this is a runtime setting independent of the DKG-only `--enable-iroh` option. It is enabled by default. Once the endpoint is advertised, it must remain enabled.
+
+          [env: FM_IROH_NEXT_ENABLE=]
+          [default: true]
+          [possible values: true, false]
+
+      --bind-api-next <BIND_API_NEXT>
+          Bind address for the transitional Iroh 1.0 API endpoint
+
+          [env: FM_BIND_API_NEXT=]
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+
+
+Module environment variables:
+  FM_ENABLE_MODULE_LNV1                     Set to 1/true to enable the LNv1 Lightning module. Disabled by default.
+  FM_ENABLE_MODULE_LNV2                     Set to 0/false to disable the LNv2 Lightning module. Enabled by default.
+  FM_ENABLE_MODULE_MINT                     Set to 1/true to enable the mint (e-cash) module. Disabled by default.
+  FM_ENABLE_MODULE_MINTV2                   Set to 0/false to disable the MintV2 module. Enabled by default.
+  FM_ENABLE_MODULE_WALLET                   Set to 1/true to enable the wallet (on-chain Bitcoin) module. Disabled by default.
+  FM_WALLET_DISABLE_AUTOMATIC_CONSENSUS_VERSION_VOTING  Set to 1/true to disable automatic consensus version voting. Useful for testing and development.
+  FM_WALLET_FEERATE_MULTIPLIER              Multiplier applied to fee rate estimates (float, clamped 1.0–32.0). Defaults to 1.0.
+  FM_WALLET_FEERATE_SOURCES                 Semicolon-separated list of JSON API URLs (with optional `#<jq-filter>`) used as fee rate sources.
+  FM_ENABLE_MODULE_WALLETV2                 Set to 0/false to disable the WalletV2 module. Enabled by default.

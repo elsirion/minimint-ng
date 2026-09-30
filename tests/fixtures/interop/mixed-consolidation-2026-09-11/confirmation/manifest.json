@@ -1,0 +1,15 @@
+{
+  "source": "/tmp/minimint-consolidation-confirm-20260911",
+  "scope": "Subsequent one-block Core confirmation after guardian stop",
+  "sha256": {
+    "README.md": "f4b94fedb8bc829188e60f740ad72356e8ff34f832ed4d959a4fa5d22d40c8d0",
+    "block.txt": "9eb8774869a37757dbb5da037f31bebc877da6d5b3b5830a95b6492942124899",
+    "chain-after.txt": "36f94ea4ba65145d5bc99954a9cd06fe572dccb8c830a3840081242c3a0df12d",
+    "chain-before.txt": "bbbac28404b0ce3400fd2af1d0f2cdcbc9430db3b00a3417fbb9098c44e68c19",
+    "confirmed-transaction.txt": "66ff1d14c901da8539cbf9089eacdc18180d606cc3d7e21a69ee25461ce59d18",
+    "intent.json": "616bcf4e03609739e5aa26d0a99377ee162987c3d1c29e5dc352bcc4b1082b8e",
+    "mempool-after.txt": "3fbbd4c6d76130399b0c79cdf41758669224a91e05b7b216953f0c9728750865",
+    "mempool-before.txt": "3dade155dbc500f153dd515f689f01455d3d516ec87ecbbe4ee53d5c1bf55132",
+    "mine.txt": "9089756552ec1a0f92b95e399870a65066fa6e550fe43bcee67ebbd8e8dc3f07"
+  }
+}

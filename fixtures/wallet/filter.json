@@ -1,0 +1,14 @@
+{
+  "guardian_scalars": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "claimant_scalar": 53843,
+  "claimant_key": "0312b6469842c193875931f55525b96f168f64465487ae5a5128b7fce5f12c42d8",
+  "tweak": "76acb91e31b612c0933932f51d1b0a44ae07b743515dfc1f69ce0a97db0356e1",
+  "witness_script": "5321024743f3fb3b21bc88abff980bd6b6325a4c75f43328444dd0cab816decc1aeb39210260e173879b4a6c4269eed33debbf971fde46ebf08facffed54afd35364585b2121035208161ba089e850675cc60a01fd0f701fe8e031dbd4835f5f4c08a46d2e1aff2103f9804236278cedbdefbb992ccc7693abdaff0adde7d7fecb7b33cf29c989aa0b54ae",
+  "script_pubkey": "00206760a3fc7b8c1d4f7266aa80773672cd98bc5f3e4e9d6eb2edf300156bef0a06",
+  "filter_digest": "0000bdc6788836dacf16b0a7a9d7cb202eca7afc0afe1b3619fb259df05f10f4"
+}

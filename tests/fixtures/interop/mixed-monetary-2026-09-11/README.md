@@ -1,0 +1,3 @@
+# Mixed monetary staged capture
+
+Public read-only captures on 2026-09-11 from new guardians 0/1 and pinned reference 2/3, grouped by driver checkpoint. Each stage retains all four native Wallet/Mint summary responses and completed signed session outcomes, plus Core chain/transaction/mempool or block evidence where relevant. These are observational stage names; cryptographic/accounting verification is a separate test. No note tokens, invites, private keys, client database or process credentials are retained. Public client config and artifact metadata link all stages to this federation. No Core mining/broadcast or daemon/driver mutation was performed by the capture worker.

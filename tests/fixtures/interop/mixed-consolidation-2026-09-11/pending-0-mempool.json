@@ -1,0 +1,25 @@
+{
+  "vsize": 316,
+  "weight": 1261,
+  "time": 1789128776,
+  "height": 149,
+  "descendantcount": 1,
+  "descendantsize": 316,
+  "ancestorcount": 1,
+  "ancestorsize": 316,
+  "wtxid": "abcbb132f17ae9d5f1f62df996d90dbc20da823864b0c047db5ebb69ba3aecdd",
+  "chunkweight": 1261,
+  "fees": {
+    "base": 0.00000632,
+    "modified": 0.00000632,
+    "ancestor": 0.00000632,
+    "descendant": 0.00000632,
+    "chunk": 0.00000632
+  },
+  "depends": [
+  ],
+  "spentby": [
+  ],
+  "bip125-replaceable": true,
+  "unbroadcast": true
+}

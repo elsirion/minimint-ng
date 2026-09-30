@@ -1,0 +1,24 @@
+{
+  "spec_revision": "06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c",
+  "rule": "WAL-016",
+  "scope": "Public discovery response contradiction: written spec object versus pinned reference string. Wallet result is null, so its populated outpoint schema is not observed here.",
+  "deposit_txid": "441127e88b3be8f451e4ce5a82efc2c45efc98e249eda8a5df892d985c9b5c9e",
+  "deposit_vout": 1,
+  "deposit_sat": 100000,
+  "mined_height": 107,
+  "sha256": {
+    "artifacts.json": "23cb6b0270463edeb71c604e6fb86d1ad3aec259ff13dfd4d713df5ada84b346",
+    "first-deposit-peer0-module_1_output_info_slice.json": "4e0ac3fbcc642f17f864b4e11dd5d19513843c4e5c9c1031bd10ab82032aeb77",
+    "first-deposit-peer0-module_1_consensus_block_count.json": "cba8e38332c80b2cec8668bc90b70d6c81ce293bf53d06fd4ff1b3deb4f5ea3a",
+    "first-deposit-peer0-module_1_federation_wallet.json": "4fb5bd7bf674e3fda36dbf53b935803a7ef6758db4a965b2956e8cee0c878642",
+    "first-deposit-peer1-module_1_output_info_slice.json": "31e78dc5d00a688cce4d46df9745415c77054dd1905b65a5d99b4c281753564d",
+    "first-deposit-peer1-module_1_consensus_block_count.json": "7b53fe7a48ffb1f6e9951e426c3901b7f8a67d7ae1cd0ff0f818859359ab09dc",
+    "first-deposit-peer1-module_1_federation_wallet.json": "1b9f3e593e73354720f2329c7bc53c56abf4ef1c4ce38ecc7d6aa26c211b9685",
+    "first-deposit-peer2-module_1_output_info_slice.json": "2e48d1835fef0182d00b052666161aa7a622b90cf409c64822c8e07242fd157d",
+    "first-deposit-peer2-module_1_consensus_block_count.json": "cba8e38332c80b2cec8668bc90b70d6c81ce293bf53d06fd4ff1b3deb4f5ea3a",
+    "first-deposit-peer2-module_1_federation_wallet.json": "1b9f3e593e73354720f2329c7bc53c56abf4ef1c4ce38ecc7d6aa26c211b9685",
+    "first-deposit-peer3-module_1_output_info_slice.json": "2e48d1835fef0182d00b052666161aa7a622b90cf409c64822c8e07242fd157d",
+    "first-deposit-peer3-module_1_consensus_block_count.json": "cba8e38332c80b2cec8668bc90b70d6c81ce293bf53d06fd4ff1b3deb4f5ea3a",
+    "first-deposit-peer3-module_1_federation_wallet.json": "1b9f3e593e73354720f2329c7bc53c56abf4ef1c4ce38ecc7d6aa26c211b9685"
+  }
+}

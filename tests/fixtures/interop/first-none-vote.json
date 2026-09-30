@@ -1,0 +1,20 @@
+{
+  "spec_revision": "06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c",
+  "reference_revision": "0c316439d60b5a08eea26fab216780eb893c45bf",
+  "reference_daemon_sha256": "d51bc18b275ac699c2d20e3ca905bc38f20afdf6b704c14b0524f9eaa20ae8b8",
+  "requirement": "WAL-004",
+  "method": "session_status",
+  "session_index": 0,
+  "verification": "Public API observations from the pinned reference executable in a fresh mixed federation. Pending results are not quorum certificates.",
+  "before_fix": [
+    "7901770a010501030001600301080106010401fd03e803010501030001600201080106010401fd03e80201050103000160010105010300016000000d0000b4b4b4b4b4b4b4b400010000000d0000b5b5b5b5b5b5b5b500010001000d0000b6b6b6b6b6b6b6b600010002000d0000b7b7b7b7b7b7b7b700010003"
+  ],
+  "reference": [
+    "8901870c010501030001600301080106010401fd03e803010501030001600201080106010401fd03e8020105010300016001010501030101000101050103000160000105010301010000000d0000b4b4b4b4b4b4b4b400010000000d0000b5b5b5b5b5b5b5b500010001000d0000b6b6b6b6b6b6b6b600010002000d0000b7b7b7b7b7b7b7b700010003"
+  ],
+  "missing_accepted_items_hex": [
+    "0105010301010001",
+    "0105010301010000"
+  ],
+  "explanation": "A missing fee-vote row must not compare equal to a stored None vote. The first None is accepted; a subsequent identical None is rejected."
+}

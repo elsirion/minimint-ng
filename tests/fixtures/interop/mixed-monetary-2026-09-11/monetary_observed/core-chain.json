@@ -1,0 +1,18 @@
+{
+  "chain": "regtest",
+  "blocks": 171,
+  "headers": 171,
+  "bestblockhash": "48b4ee93c6a3dda2bc4bdea6482983f598e9a7cd8c5f16ec4f9796c6ccdecf5b",
+  "bits": "207fffff",
+  "target": "7fffff0000000000000000000000000000000000000000000000000000000000",
+  "difficulty": 4.656542373906925e-10,
+  "time": 1789130598,
+  "mediantime": 1789130597,
+  "verificationprogress": 1,
+  "initialblockdownload": false,
+  "chainwork": "0000000000000000000000000000000000000000000000000000000000000158",
+  "size_on_disk": 80821,
+  "pruned": false,
+  "warnings": [
+  ]
+}
