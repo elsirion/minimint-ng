@@ -62,5 +62,60 @@ pub fn write_frame(writer: &mut impl Write, body: &[u8]) -> Result<(), Transport
     Ok(())
 }
 pub mod envelope;
+pub mod iroh;
+mod iroh_peer;
 mod peer;
 pub use peer::PeerNetwork;
+/// A guardian's private transport identity: a TLS certificate/key for the TCP
+/// profile, or the two Iroh endpoint secrets. Never part of consensus. No Debug.
+pub enum TransportIdentity {
+    Tls(tls::Identity),
+    Iroh(iroh::IrohIdentity),
+}
+impl From<tls::Identity> for TransportIdentity {
+    fn from(identity: tls::Identity) -> Self {
+        Self::Tls(identity)
+    }
+}
+impl From<iroh::IrohIdentity> for TransportIdentity {
+    fn from(identity: iroh::IrohIdentity) -> Self {
+        Self::Iroh(identity)
+    }
+}
+impl TransportIdentity {
+    pub fn tls(&self) -> Option<&tls::Identity> {
+        match self {
+            Self::Tls(identity) => Some(identity),
+            Self::Iroh(_) => None,
+        }
+    }
+    pub fn iroh(&self) -> Option<&iroh::IrohIdentity> {
+        match self {
+            Self::Iroh(identity) => Some(identity),
+            Self::Tls(_) => None,
+        }
+    }
+    /// TLS profile only: the configured certificate (Iroh has none).
+    pub fn certificate_der(&self) -> Result<Vec<u8>, TransportError> {
+        self.tls()
+            .ok_or(TransportError::InvalidIdentity)?
+            .certificate_der()
+    }
+    /// TLS profile only: the private PKCS#8 key (Iroh has none).
+    pub fn private_key_der(&self) -> Result<Vec<u8>, TransportError> {
+        self.tls()
+            .ok_or(TransportError::InvalidIdentity)?
+            .private_key_der()
+    }
+    /// Independent owned copy for a one-shot handoff (TLS through DER).
+    pub fn duplicate(&self) -> Result<Self, TransportError> {
+        Ok(match self {
+            Self::Tls(identity) => {
+                let certificate = identity.certificate_der()?;
+                let private = zeroize::Zeroizing::new(identity.private_key_der()?);
+                Self::Tls(tls::Identity::from_der(&certificate, &private)?)
+            }
+            Self::Iroh(identity) => Self::Iroh(identity.clone()),
+        })
+    }
+}

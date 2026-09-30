@@ -19,6 +19,11 @@ parity-scale-codec = { version = "=3.7.5", default-features = false }
 sonic-rs = { version = "=0.5.8", default-features = false }
 # Safe signal-to-atomic-flag boundary; no iterator/channel features.
 signal-hook = { version = "=0.4.4", default-features = false }
+# Iroh transport (user-authorized 2026-09-30). Exact baseline versions: 1.0.3
+# carries guardian P2P, 0.35.0 the client-facing API. Tokio is required by both.
+iroh = { version = "=0.35.0", default-features = false }
+iroh-next = { package = "iroh", version = "=1.0.3", default-features = false, features = ["tls-ring"] }
+tokio = { version = "=1.50.0", default-features = false, features = ["rt-multi-thread", "time", "sync", "macros"] }
 
 [lints.rust]
 # Only the reviewed raw BLS adapter may locally allow unsafe code.

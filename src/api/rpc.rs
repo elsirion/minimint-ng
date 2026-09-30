@@ -44,6 +44,16 @@ pub struct Request {
     pub params: Value,
 }
 impl Request {
+    /// A request without JSON-RPC identifier, as carried by an Iroh API stream
+    /// (API-002). The caller has already validated its envelope.
+    pub(crate) fn new(method: String, auth: Option<Zeroizing<String>>, params: Value) -> Self {
+        Self {
+            id: None,
+            method,
+            auth,
+            params,
+        }
+    }
     /// Transport authentication never supplies administrator authorization.
     pub fn require_admin(&self, expected: &str) -> Result<(), RpcError> {
         let supplied = self

@@ -2,9 +2,12 @@
 //! Regtest timing: 250ms TCP connect, 500ms total TLS handshake, 100ms reconnect,
 //! 2ms worker tick. These are local scheduling choices, not consensus constants.
 //! Successful send means queued, with no acknowledgement or replay guarantee.
+//! The same queues also carry the Iroh backend (`start_iroh`); only connection
+//! establishment and framing differ between the two transports.
 use super::{
     MAX_FRAME_LEN, TransportError,
     envelope::Envelope,
+    iroh::{IrohIdentity, IrohOptions, MAX_P2P_MESSAGE_BYTES},
     tls::{AuthenticatedStream, TlsConfig},
 };
 use crate::protocol::PeerId;
@@ -21,24 +24,29 @@ use std::{
 };
 use zeroize::Zeroizing;
 const TICK: Duration = Duration::from_millis(2);
-type Frame = Zeroizing<Vec<u8>>;
+pub(super) type Frame = Zeroizing<Vec<u8>>;
 #[derive(Default)]
-struct Slot {
-    generation: u64,
-    connected: bool,
-    outgoing: VecDeque<Frame>,
-    outstanding: usize,
-    incoming: VecDeque<Envelope>,
+pub(super) struct Slot {
+    pub(super) generation: u64,
+    pub(super) connected: bool,
+    pub(super) outgoing: VecDeque<Frame>,
+    pub(super) outstanding: usize,
+    pub(super) incoming: VecDeque<Envelope>,
+    /// Wakes an asynchronous (Iroh) writer; unused by TLS workers.
+    pub(super) queued: Arc<tokio::sync::Notify>,
 }
-struct State {
-    slots: BTreeMap<PeerId, Slot>,
+pub(super) struct State {
+    pub(super) slots: BTreeMap<PeerId, Slot>,
     cursor: Option<PeerId>,
 }
-struct Shared {
-    state: Mutex<State>,
-    wake: Condvar,
-    stop: AtomicBool,
-    capacity: usize,
+pub(super) struct Shared {
+    pub(super) state: Mutex<State>,
+    pub(super) wake: Condvar,
+    pub(super) stop: AtomicBool,
+    pub(super) capacity: usize,
+    /// TLS frames carry a BE64 length; an Iroh stream is the bare body.
+    framed: bool,
+    max_body: usize,
 }
 /// Owns the listener/controller and all connection workers. Both receive methods
 /// consume the same per-peer FIFO. Disconnect retains already received envelopes,
@@ -61,15 +69,7 @@ impl PeerNetwork {
             return Err(TransportError::InvalidIdentity);
         }
         listener.set_nonblocking(true)?;
-        let shared = Arc::new(Shared {
-            state: Mutex::new(State {
-                slots: addresses.keys().map(|p| (*p, Slot::default())).collect(),
-                cursor: None,
-            }),
-            wake: Condvar::new(),
-            stop: AtomicBool::new(false),
-            capacity: queue_capacity,
-        });
+        let shared = Shared::new(addresses.keys().copied(), queue_capacity, true);
         let worker = shared.clone();
         let controller = thread::Builder::new()
             .name(format!("peer-controller-{}", local.0))
@@ -79,13 +79,64 @@ impl PeerNetwork {
             controller: Some(controller),
         })
     }
+    /// Iroh transport (NET-002): `peers` maps every guardian, including the local
+    /// one, to its configured P2P endpoint key. The endpoint is bound before this
+    /// returns; dialing, acceptance and all streams run on an owned runtime that
+    /// is joined by shutdown. NET-004's lower-identifier dialing rule applies.
+    pub fn start_iroh(
+        local: PeerId,
+        identity: &IrohIdentity,
+        peers: BTreeMap<PeerId, [u8; 32]>,
+        bind: SocketAddr,
+        options: IrohOptions,
+        queue_capacity: usize,
+    ) -> Result<Self, TransportError> {
+        let distinct: std::collections::BTreeSet<_> = peers.values().collect();
+        if queue_capacity == 0
+            || peers.get(&local) != Some(&identity.p2p_public())
+            || distinct.len() != peers.len()
+        {
+            return Err(TransportError::InvalidIdentity);
+        }
+        let runtime = super::iroh::runtime(&format!("peer-iroh-{}", local.0))?;
+        let endpoint =
+            runtime.block_on(super::iroh::bind_p2p(identity.p2p_secret(), bind, &options))?;
+        let shared = Shared::new(
+            peers.keys().copied().filter(|peer| *peer != local),
+            queue_capacity,
+            false,
+        );
+        let worker = shared.clone();
+        let controller = thread::Builder::new()
+            .name(format!("peer-controller-{}", local.0))
+            .spawn(move || {
+                let result = runtime.block_on(super::iroh_peer::control(
+                    local,
+                    endpoint,
+                    peers,
+                    options,
+                    worker.clone(),
+                ));
+                worker.stop.store(true, Ordering::Release);
+                worker.wake.notify_all();
+                runtime.shutdown_timeout(Duration::from_secs(5));
+                result
+            });
+        match controller {
+            Ok(controller) => Ok(Self {
+                shared,
+                controller: Some(controller),
+            }),
+            Err(error) => Err(error.into()),
+        }
+    }
     pub fn send(&self, peer: PeerId, message: Envelope) -> Result<(), TransportError> {
         let body = Zeroizing::new(
             message
                 .encode_legacy()
                 .map_err(|_| TransportError::InvalidEnvelope)?,
         );
-        if body.len() > MAX_FRAME_LEN {
+        if body.len() > self.shared.max_body {
             return Err(TransportError::FrameTooLarge);
         }
         let mut state = self
@@ -103,11 +154,17 @@ impl PeerNetwork {
         if slot.outstanding >= self.shared.capacity {
             return Err(TransportError::QueueFull);
         }
-        let mut frame = Zeroizing::new(Vec::with_capacity(8 + body.len()));
-        frame.extend_from_slice(&(body.len() as u64).to_be_bytes());
-        frame.extend_from_slice(&body);
+        let frame = if self.shared.framed {
+            let mut frame = Zeroizing::new(Vec::with_capacity(8 + body.len()));
+            frame.extend_from_slice(&(body.len() as u64).to_be_bytes());
+            frame.extend_from_slice(&body);
+            frame
+        } else {
+            body
+        };
         slot.outgoing.push_back(frame);
         slot.outstanding += 1;
+        slot.queued.notify_one();
         Ok(())
     }
     pub fn try_recv(&self, peer: PeerId) -> Result<Option<Envelope>, TransportError> {
@@ -199,6 +256,25 @@ impl PeerNetwork {
             handle.join().map_err(|_| TransportError::Closed)??;
         }
         Ok(())
+    }
+}
+impl Shared {
+    fn new(peers: impl Iterator<Item = PeerId>, capacity: usize, framed: bool) -> Arc<Self> {
+        Arc::new(Self {
+            state: Mutex::new(State {
+                slots: peers.map(|p| (p, Slot::default())).collect(),
+                cursor: None,
+            }),
+            wake: Condvar::new(),
+            stop: AtomicBool::new(false),
+            capacity,
+            framed,
+            max_body: if framed {
+                MAX_FRAME_LEN
+            } else {
+                MAX_P2P_MESSAGE_BYTES
+            },
+        })
     }
 }
 impl Drop for PeerNetwork {
@@ -307,10 +383,10 @@ fn install(
     workers.push(handle);
     Ok(())
 }
-fn current(slot: &Slot, generation: u64) -> bool {
+pub(super) fn current(slot: &Slot, generation: u64) -> bool {
     slot.connected && slot.generation == generation
 }
-fn disconnect(shared: &Shared, peer: PeerId, generation: u64) {
+pub(super) fn disconnect(shared: &Shared, peer: PeerId, generation: u64) {
     if let Ok(mut state) = shared.state.lock() {
         let Some(slot) = state.slots.get_mut(&peer) else {
             return;

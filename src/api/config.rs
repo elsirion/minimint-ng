@@ -162,7 +162,8 @@ impl ConfigApi {
         software_identity: String,
         support: SupportSummary,
     ) -> Result<Self, ConfigApiError> {
-        if !server.api_endpoints.contains_key(&local_peer)
+        let endpoints = server.client_api_endpoints();
+        if !endpoints.contains_key(&local_peer)
             || software_identity.is_empty()
             || support.core.core_consensus != server.consensus_version
             || support.modules.keys().ne(server.modules.keys())
@@ -176,7 +177,7 @@ impl ConfigApi {
         let client = server.client_config();
         let federation_id = client.federation_id();
         let invite = Invite::compact(
-            &server.api_endpoints,
+            &endpoints,
             federation_id,
             invite_secret.as_ref().map(|secret| secret.to_string()),
         )

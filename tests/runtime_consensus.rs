@@ -62,7 +62,7 @@ impl Running {
                 Arc::new(
                     PeerNetwork::start(
                         PeerId(p as u16),
-                        configs[p].tls_config(),
+                        configs[p].tls_config().unwrap(),
                         configs[p].resolve_peer_addresses().unwrap(),
                         l,
                         256,
@@ -648,7 +648,7 @@ fn backend_fee_failure_withdraws_a_present_vote_and_recovery_remains_possible() 
     let network = Arc::new(
         PeerNetwork::start(
             PeerId(0),
-            config.tls_config(),
+            config.tls_config().unwrap(),
             config.resolve_peer_addresses().unwrap(),
             listener,
             64,

@@ -1,6 +1,6 @@
 use minimint_ng::{
     config::BitcoinNetwork,
-    daemon::options::{self, BitcoinSource, Command, OptionsError},
+    daemon::options::{self, BitcoinSource, Command, OptionsError, TransportOptions},
 };
 use std::{ffi::OsString, time::Duration};
 fn args() -> Vec<OsString> {
@@ -227,4 +227,81 @@ fn esplora_backend_and_signet_network_are_explicit_alternatives() {
         values.extend(["--bitcoin-network".into(), network.into()]);
         assert_eq!(options::parse(values).err(), Some(OptionsError::Profile));
     }
+}
+
+fn iroh_args() -> Vec<OsString> {
+    let mut values = args();
+    // Drop --api-url and --p2p-url with their values.
+    values.drain(6..10);
+    values.extend(["--transport".into(), "iroh".into()]);
+    values
+}
+
+#[test]
+fn iroh_transport_replaces_advertised_urls_and_is_explicit() {
+    let Command::Run(run) = options::parse(args()).ok().unwrap() else {
+        panic!("run");
+    };
+    assert!(matches!(run.transport, TransportOptions::Tcp { .. }));
+    let Command::Run(run) = options::parse(iroh_args()).ok().unwrap() else {
+        panic!("run");
+    };
+    let TransportOptions::Iroh(settings) = &run.transport else {
+        panic!("iroh");
+    };
+    assert!(settings.discovery);
+    assert!(settings.address_file.is_none() && settings.secret_file.is_none());
+    let mut values = iroh_args();
+    values.extend([
+        "--iroh-discovery".into(),
+        "false".into(),
+        "--iroh-address-file".into(),
+        "addresses.json".into(),
+        "--iroh-secret-file".into(),
+        "iroh-secret".into(),
+    ]);
+    let Command::Run(run) = options::parse(values).ok().unwrap() else {
+        panic!("run");
+    };
+    let TransportOptions::Iroh(settings) = &run.transport else {
+        panic!("iroh");
+    };
+    assert!(!settings.discovery);
+    assert_eq!(
+        settings.address_file.as_deref(),
+        Some("addresses.json".as_ref())
+    );
+    assert_eq!(
+        settings.secret_file.as_deref(),
+        Some("iroh-secret".as_ref())
+    );
+    // Iroh advertises keys, not URLs, and cannot carry the WebSocket access secret.
+    for extra in [
+        ["--api-url", "ws://127.0.0.1:18100/"],
+        ["--p2p-url", "fedimint://127.0.0.1:18101/"],
+        ["--access-secret-file", "access"],
+    ] {
+        let mut values = iroh_args();
+        values.extend(extra.map(OsString::from));
+        assert_eq!(
+            options::parse(values).err(),
+            Some(OptionsError::Profile),
+            "{extra:?}"
+        );
+    }
+    // Iroh settings are meaningless for TCP; unknown transports are rejected.
+    let mut values = args();
+    values.extend(["--iroh-discovery".into(), "false".into()]);
+    assert_eq!(options::parse(values).err(), Some(OptionsError::Profile));
+    let mut values = args();
+    values.extend(["--transport".into(), "quic".into()]);
+    assert_eq!(options::parse(values).err(), Some(OptionsError::Profile));
+    let mut values = iroh_args();
+    values.extend(["--iroh-discovery".into(), "maybe".into()]);
+    assert_eq!(options::parse(values).err(), Some(OptionsError::Argument));
+    // TCP still requires both advertised URLs.
+    let mut values = iroh_args();
+    values.drain(values.len() - 2..);
+    assert_eq!(options::parse(values).err(), Some(OptionsError::Missing));
+    assert!(options::USAGE.contains("--transport tcp|iroh"));
 }

@@ -14,21 +14,38 @@ use std::{
 use zeroize::Zeroizing;
 
 pub const USAGE: &str = "fedimintd --data-dir PATH --api-bind IP:PORT --p2p-bind IP:PORT \
---api-url ws://HOST:PORT/ --p2p-url fedimint://HOST:PORT/ \
+[--transport tcp|iroh] \
+(--api-url ws://HOST:PORT/ --p2p-url fedimint://HOST:PORT/ | [--iroh-discovery true|false] \
+[--iroh-address-file PATH] [--iroh-secret-file PATH]) \
 (--bitcoin-rpc IP:PORT --bitcoin-rpc-credentials-file PATH | --esplora-url URL) \
 --admin-secret-file PATH [--bitcoin-network regtest|signet] [--access-secret-file PATH] \
-[--round-delay-ms 50]\n\nDeployment profile: Bitcoin regtest (default) or signet, built-in Mint v2 and Wallet v2.\nCredentials file contains username:password (or Bitcoin Core cookie contents).\nEsplora URL: https://HOST[:PORT][/PATH] (system trust store), or http:// with a loopback IP.\nSecret files require Linux x86_64 with /proc/self/fd mounted.\nThey must be private regular files without a final symlink; one final LF or CRLF is stripped.\n";
+[--round-delay-ms 50]\n\nDeployment profile: Bitcoin regtest (default) or signet, built-in Mint v2 and Wallet v2.\nCredentials file contains username:password (or Bitcoin Core cookie contents).\nEsplora URL: https://HOST[:PORT][/PATH] (system trust store), or http:// with a loopback IP.\nSecret files require Linux x86_64 with /proc/self/fd mounted.\nThey must be private regular files without a final symlink; one final LF or CRLF is stripped.\n\nTransport (default tcp): tcp uses mutual TLS between guardians and advertises the two URLs.\niroh uses Iroh 1.0 for guardian P2P (UDP on --p2p-bind) and serves the client API over\nIroh 0.35 (UDP on --api-bind); setup codes carry the two endpoint keys, not URLs.\nThe WebSocket listener on --api-bind (TCP) remains for setup and administration.\nA restart must repeat the stored transport. --iroh-discovery (default true) uses the n0\nDNS/pkarr discovery services and default relays; false disables both. The address file is\na JSON object mapping 64-hex endpoint keys to IP:PORT direct addresses (public data).\nThe secret file holds 128 hex digits (API secret, then P2P secret) used only for a fresh\nsetup. --access-secret-file is not supported with iroh.\n";
 pub struct Options {
     pub data_dir: PathBuf,
     pub api_bind: SocketAddr,
     pub p2p_bind: SocketAddr,
-    pub api_url: CanonicalUrl,
-    pub p2p_url: CanonicalUrl,
+    pub transport: TransportOptions,
     pub bitcoin: BitcoinSource,
     pub bitcoin_network: BitcoinNetwork,
     pub admin_secret_file: PathBuf,
     pub access_secret_file: Option<PathBuf>,
     pub round_delay: Duration,
+}
+/// Guardian transport selection. It also selects the setup-code endpoint variant
+/// of a fresh federation and must match stored configuration on restart.
+pub enum TransportOptions {
+    /// Mutual TLS P2P and WebSocket API, advertising both URLs.
+    Tcp {
+        api_url: CanonicalUrl,
+        p2p_url: CanonicalUrl,
+    },
+    Iroh(IrohSettings),
+}
+/// Local Iroh choices; paths are read by the process driver, never parsed here.
+pub struct IrohSettings {
+    pub discovery: bool,
+    pub address_file: Option<PathBuf>,
+    pub secret_file: Option<PathBuf>,
 }
 /// Exactly one Bitcoin backend adapter is configured.
 pub enum BitcoinSource {
@@ -101,6 +118,10 @@ pub fn parse(args: impl IntoIterator<Item = OsString>) -> Result<Command, Option
                 | "--admin-secret-file"
                 | "--access-secret-file"
                 | "--round-delay-ms"
+                | "--transport"
+                | "--iroh-discovery"
+                | "--iroh-address-file"
+                | "--iroh-secret-file"
         ) {
             return Err(OptionsError::Argument);
         }
@@ -120,13 +141,61 @@ pub fn parse(args: impl IntoIterator<Item = OsString>) -> Result<Command, Option
     let p2p_bind = string(take("--p2p-bind")?)?
         .parse()
         .map_err(|_| OptionsError::Address)?;
-    let api_url =
-        CanonicalUrl::simple(&string(take("--api-url")?)?).map_err(|_| OptionsError::Url)?;
-    let p2p_url =
-        CanonicalUrl::simple(&string(take("--p2p-url")?)?).map_err(|_| OptionsError::Url)?;
-    if !api_url.as_str().starts_with("ws://") || super::config::tcp_authority(&p2p_url).is_err() {
-        return Err(OptionsError::Profile);
-    }
+    let iroh_flags = [
+        "--iroh-discovery",
+        "--iroh-address-file",
+        "--iroh-secret-file",
+    ];
+    let transport = match fields
+        .remove("--transport")
+        .map(string)
+        .transpose()?
+        .as_deref()
+    {
+        None | Some("tcp") => {
+            if iroh_flags.iter().any(|flag| fields.contains_key(*flag)) {
+                return Err(OptionsError::Profile);
+            }
+            let mut take = |name: &str| fields.remove(name).ok_or(OptionsError::Missing);
+            let api_url = CanonicalUrl::simple(&string(take("--api-url")?)?)
+                .map_err(|_| OptionsError::Url)?;
+            let p2p_url = CanonicalUrl::simple(&string(take("--p2p-url")?)?)
+                .map_err(|_| OptionsError::Url)?;
+            if !api_url.as_str().starts_with("ws://")
+                || super::config::tcp_authority(&p2p_url).is_err()
+            {
+                return Err(OptionsError::Profile);
+            }
+            TransportOptions::Tcp { api_url, p2p_url }
+        }
+        Some("iroh") => {
+            // Iroh setup codes carry endpoint keys; no URL is advertised, and the
+            // Iroh API cannot carry the WebSocket access secret (API-002).
+            if ["--api-url", "--p2p-url", "--access-secret-file"]
+                .iter()
+                .any(|flag| fields.contains_key(*flag))
+            {
+                return Err(OptionsError::Profile);
+            }
+            let discovery = match fields
+                .remove("--iroh-discovery")
+                .map(string)
+                .transpose()?
+                .as_deref()
+            {
+                None | Some("true") => true,
+                Some("false") => false,
+                Some(_) => return Err(OptionsError::Argument),
+            };
+            TransportOptions::Iroh(IrohSettings {
+                discovery,
+                address_file: fields.remove("--iroh-address-file").map(PathBuf::from),
+                secret_file: fields.remove("--iroh-secret-file").map(PathBuf::from),
+            })
+        }
+        Some(_) => return Err(OptionsError::Profile),
+    };
+    let mut take = |name: &str| fields.remove(name).ok_or(OptionsError::Missing);
     let admin_secret_file = PathBuf::from(take("--admin-secret-file")?);
     let bitcoin = match (
         fields.remove("--bitcoin-rpc"),
@@ -174,8 +243,7 @@ pub fn parse(args: impl IntoIterator<Item = OsString>) -> Result<Command, Option
         data_dir,
         api_bind,
         p2p_bind,
-        api_url,
-        p2p_url,
+        transport,
         bitcoin,
         bitcoin_network,
         admin_secret_file,

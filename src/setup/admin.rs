@@ -1,7 +1,7 @@
 //! Typed setup administration; API authentication and JSON belong to API layer.
 use crate::{
     config::{self, BitcoinNetwork, CanonicalUrl, SetupEndpoints, SetupRecord},
-    net::tls::Identity,
+    net::{TransportIdentity, iroh::IrohIdentity, tls::Identity},
     protocol::PeerId,
 };
 use std::collections::BTreeSet;
@@ -60,27 +60,58 @@ pub struct GenerationInputs {
     pub peer: PeerId,
     pub records: std::collections::BTreeMap<PeerId, SetupRecord>,
 }
+/// Transport of the local setup code. An optional Iroh preset lets an operator
+/// supply the endpoint secrets (e.g. to pre-share direct addresses); otherwise
+/// they are generated when local parameters are first set.
+enum SetupTransportKind {
+    Tcp {
+        api_url: CanonicalUrl,
+        p2p_url: CanonicalUrl,
+    },
+    Iroh {
+        preset: Option<IrohIdentity>,
+    },
+}
 pub struct SetupState {
-    api_url: CanonicalUrl,
-    p2p_url: CanonicalUrl,
+    transport: SetupTransportKind,
     network: BitcoinNetwork,
     release: String,
     params: Option<LocalParams>,
     local: Option<SetupRecord>,
-    identity: Option<Identity>,
+    identity: Option<TransportIdentity>,
     peers: BTreeSet<SetupRecord>,
     restoring: bool,
 }
 impl SetupState {
+    /// TCP profile: the setup code carries both advertised URLs and a TLS certificate.
     pub fn new(
         api_url: CanonicalUrl,
         p2p_url: CanonicalUrl,
         network: BitcoinNetwork,
         release: String,
     ) -> Self {
+        Self::with_transport(
+            SetupTransportKind::Tcp { api_url, p2p_url },
+            network,
+            release,
+        )
+    }
+    /// Iroh profile: the setup code carries the API and P2P endpoint public keys
+    /// (endpoint variant 1). No URL is advertised.
+    pub fn new_iroh(
+        network: BitcoinNetwork,
+        release: String,
+        preset: Option<IrohIdentity>,
+    ) -> Self {
+        Self::with_transport(SetupTransportKind::Iroh { preset }, network, release)
+    }
+    fn with_transport(
+        transport: SetupTransportKind,
+        network: BitcoinNetwork,
+        release: String,
+    ) -> Self {
         Self {
-            api_url,
-            p2p_url,
+            transport,
             network,
             release,
             params: None,
@@ -100,7 +131,7 @@ impl SetupState {
     pub fn get_setup_code(&self) -> Option<String> {
         self.local.as_ref().map(SetupRecord::to_code)
     }
-    pub fn identity(&self) -> Option<&Identity> {
+    pub fn identity(&self) -> Option<&TransportIdentity> {
         self.identity.as_ref()
     }
     /// Restore archive handling is outside the daemon profile. This flag only
@@ -120,10 +151,16 @@ impl SetupState {
         }
         let mut record = SetupRecord {
             name: params.name.clone(),
-            endpoints: SetupEndpoints::Tcp {
-                api_url: self.api_url.clone(),
-                p2p_url: self.p2p_url.clone(),
-                certificate: Vec::new(),
+            endpoints: match &self.transport {
+                SetupTransportKind::Tcp { api_url, p2p_url } => SetupEndpoints::Tcp {
+                    api_url: api_url.clone(),
+                    p2p_url: p2p_url.clone(),
+                    certificate: Vec::new(),
+                },
+                SetupTransportKind::Iroh { .. } => SetupEndpoints::Iroh {
+                    api_key: [0; 32],
+                    p2p_key: [0; 32],
+                },
             },
             federation_name: params.federation_name.clone(),
             disable_base_fees: params.disable_base_fees,
@@ -135,12 +172,28 @@ impl SetupState {
         record
             .validate_local_parameters()
             .map_err(|_| AdminError::InvalidParameters)?;
-        let identity =
-            Identity::generate(&params.name).map_err(|_| AdminError::TransportIdentity)?;
-        if let SetupEndpoints::Tcp { certificate, .. } = &mut record.endpoints {
-            *certificate = identity
-                .certificate_der()
-                .map_err(|_| AdminError::TransportIdentity)?;
+        let identity: TransportIdentity = match &self.transport {
+            SetupTransportKind::Tcp { .. } => Identity::generate(&params.name)
+                .map_err(|_| AdminError::TransportIdentity)?
+                .into(),
+            SetupTransportKind::Iroh {
+                preset: Some(preset),
+            } => preset.clone().into(),
+            SetupTransportKind::Iroh { preset: None } => IrohIdentity::generate()
+                .map_err(|_| AdminError::TransportIdentity)?
+                .into(),
+        };
+        match (&mut record.endpoints, &identity) {
+            (SetupEndpoints::Tcp { certificate, .. }, TransportIdentity::Tls(tls)) => {
+                *certificate = tls
+                    .certificate_der()
+                    .map_err(|_| AdminError::TransportIdentity)?;
+            }
+            (SetupEndpoints::Iroh { api_key, p2p_key }, TransportIdentity::Iroh(iroh)) => {
+                *api_key = iroh.api_public();
+                *p2p_key = iroh.p2p_public();
+            }
+            _ => return Err(AdminError::TransportIdentity),
         }
         let code = record.to_code();
         self.params = Some(params);

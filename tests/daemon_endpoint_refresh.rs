@@ -289,7 +289,7 @@ fn rpc_endpoint_move_is_durable_and_restored_process_uses_new_destination() {
         },
     };
     let store = Store::open(dir.path().join("guardian")).unwrap();
-    setup::persist_generated(&store, &generated, &local_identity).unwrap();
+    setup::persist_generated(&store, &generated, &local_identity.into()).unwrap();
     drop(store);
     drop(generated);
     drop(config);

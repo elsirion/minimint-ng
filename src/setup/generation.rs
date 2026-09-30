@@ -2,8 +2,8 @@ use super::{SetupError, SetupTransport, run_g2_dkg};
 use crate::{
     codec::{ConsensusEncode, text},
     config::{
-        self, DescriptorKind, Endpoint, Fee, RawMintConfig, RawServerConfig, RawWalletConfig,
-        ServerModuleConfig, SetupEndpoints, SetupRecord,
+        self, DescriptorKind, Endpoint, Fee, IrohEndpoint, RawMintConfig, RawServerConfig,
+        RawWalletConfig, ServerModuleConfig, SetupEndpoints, SetupRecord,
     },
     crypto::{
         bls::{self, Scalar},
@@ -33,7 +33,7 @@ pub struct GeneratedSecrets {
 }
 pub struct GeneratedConfig {
     pub server: RawServerConfig,
-    /// Retains TCP peer addresses needed to reconnect after a restart.
+    /// Retains TCP peer addresses or Iroh keys needed to reconnect after a restart.
     pub setup_records: BTreeMap<PeerId, SetupRecord>,
     pub peer: PeerId,
     pub secrets: GeneratedSecrets,
@@ -82,8 +82,10 @@ fn exchange_public_key(
     }
     Ok(keys)
 }
-/// Fresh serial generation for the closed TCP Mint/Wallet profile. Neither module
-/// boundaries nor denomination numbers are added to the peer message stream.
+/// Fresh serial generation for the closed Mint/Wallet profile over either
+/// transport. Neither module boundaries nor denomination numbers are added to
+/// the peer message stream. SET-006: a TCP setup fills the API and TLS maps; an
+/// Iroh setup leaves both empty and fills the Iroh endpoint map instead.
 pub fn generate(
     local: PeerId,
     records: &BTreeMap<PeerId, SetupRecord>,
@@ -94,12 +96,7 @@ pub fn generate(
     let local_record = records
         .get(&local)
         .ok_or(SetupError::InvalidConfiguration)?;
-    if records
-        .values()
-        .any(|record| !matches!(record.endpoints, SetupEndpoints::Tcp { .. }))
-    {
-        return Err(SetupError::UnsupportedProfile);
-    }
+    // validate_setup_set already requires one endpoint variant for all records.
     let modules = records
         .values()
         .find_map(|record| record.enabled_modules.as_ref())
@@ -167,24 +164,35 @@ pub fn generate(
         network: local_record.network,
     };
     let mut api_endpoints = BTreeMap::new();
+    let mut iroh_endpoints = BTreeMap::new();
     let mut tls_certificates = BTreeMap::new();
     for (peer, record) in records {
-        let SetupEndpoints::Tcp {
-            api_url,
-            certificate,
-            ..
-        } = &record.endpoints
-        else {
-            return Err(SetupError::UnsupportedProfile);
-        };
-        api_endpoints.insert(
-            *peer,
-            Endpoint {
-                url: api_url.clone(),
-                name: record.name.clone(),
-            },
-        );
-        tls_certificates.insert(*peer, text::hex_encode(certificate));
+        match &record.endpoints {
+            SetupEndpoints::Tcp {
+                api_url,
+                certificate,
+                ..
+            } => {
+                api_endpoints.insert(
+                    *peer,
+                    Endpoint {
+                        url: api_url.clone(),
+                        name: record.name.clone(),
+                    },
+                );
+                tls_certificates.insert(*peer, text::hex_encode(certificate));
+            }
+            SetupEndpoints::Iroh { api_key, p2p_key } => {
+                iroh_endpoints.insert(
+                    *peer,
+                    IrohEndpoint {
+                        name: record.name.clone(),
+                        api_key: *api_key,
+                        p2p_key: *p2p_key,
+                    },
+                );
+            }
+        }
     }
     let server = RawServerConfig {
         code_release: config::normalize_release(&local_record.release).into(),
@@ -192,7 +200,7 @@ pub fn generate(
         broadcast_public_keys,
         rounds_per_session: 3600,
         api_endpoints,
-        iroh_endpoints: BTreeMap::new(),
+        iroh_endpoints,
         tls_certificates,
         modules: BTreeMap::from([
             (

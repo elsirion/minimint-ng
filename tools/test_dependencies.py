@@ -110,6 +110,37 @@ class DependencyPolicyTests(unittest.TestCase):
         path.write_text(json.dumps(reviews))
         self.assertTrue(any('outside baseline' in error for error in self.check()['errors']))
 
+    def reviews(self):
+        path = self.root / 'vendor-metadata/reviewed-extra-versions.json'
+        return path, json.loads(path.read_text())
+
+    def test_wasm_only_divergence_requires_recorded_gated_edges(self):
+        path, reviews = self.reviews()
+        gated = next(r for r in reviews if r.get('target_gated_edges'))
+        del gated['target_gated_edges']
+        path.write_text(json.dumps(reviews))
+        self.assertTrue(any('outside baseline' in error for error in self.check()['errors']))
+
+    def test_gated_edge_must_exist_in_baseline_resolution(self):
+        path, reviews = self.reviews()
+        gated = next(r for r in reviews if r.get('target_gated_edges'))
+        gated['target_gated_edges'].append(
+            {'from': ['futures-timer', '3.0.3'], 'to': ['bumpalo', '3.20.3'], 'target': 'cfg(any())'})
+        path.write_text(json.dumps(reviews))
+        self.assertTrue(any('target-gated' in error for error in self.check()['errors']))
+
+    def test_gated_edges_cannot_approve_host_reachable_change(self):
+        import tomllib
+        self.alter('Cargo.lock', 'name = "futures-timer"\nversion = "3.0.3"',
+                   'name = "futures-timer"\nversion = "3.0.4"')
+        packages = tomllib.loads((self.root / 'Cargo.lock').read_text())['package']
+        changed = next(p for p in packages if p['name'] == 'futures-timer')
+        path, reviews = self.reviews()
+        edges = next(r for r in reviews if r.get('target_gated_edges'))['target_gated_edges']
+        reviews.append({**changed, 'reason': 'invalid attempt', 'target_gated_edges': edges})
+        path.write_text(json.dumps(reviews))
+        self.assertTrue(any('outside baseline' in error for error in self.check()['errors']))
+
 
 if __name__ == '__main__':
     unittest.main()

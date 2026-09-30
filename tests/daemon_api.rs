@@ -52,7 +52,7 @@ fn running_routes_acceptance_concurrent_waits_and_admin_boundary() {
     let network = Arc::new(
         PeerNetwork::start(
             PeerId(0),
-            config.tls_config(),
+            config.tls_config().unwrap(),
             config.resolve_peer_addresses().unwrap(),
             listener,
             64,

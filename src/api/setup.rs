@@ -5,7 +5,7 @@ use super::{
 };
 use crate::{
     json,
-    net::tls::Identity,
+    net::TransportIdentity,
     setup::{GenerationInputs, LocalParams, SetupState},
 };
 use sonic_rs::{JsonContainerTrait, JsonValueTrait, Value, json as value};
@@ -21,7 +21,7 @@ use zeroize::Zeroizing;
 /// The driver owns this identity after a successful start handoff. Never log it.
 pub struct GenerationJob {
     pub inputs: GenerationInputs,
-    pub identity: Identity,
+    pub identity: TransportIdentity,
 }
 struct State {
     setup: SetupState,
@@ -202,10 +202,12 @@ impl SetupApi {
             }
             "start_dkg" => {
                 let inputs = state.setup.generation_inputs().map_err(|_| START)?;
-                let identity = state.setup.identity().ok_or(START)?;
-                let certificate = identity.certificate_der().map_err(|_| START)?;
-                let private = Zeroizing::new(identity.private_key_der().map_err(|_| START)?);
-                let identity = Identity::from_der(&certificate, &private).map_err(|_| START)?;
+                let identity = state
+                    .setup
+                    .identity()
+                    .ok_or(START)?
+                    .duplicate()
+                    .map_err(|_| START)?;
                 self.generation
                     .try_send(GenerationJob { inputs, identity })
                     .map_err(|_| START)?;

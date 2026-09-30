@@ -1,5 +1,6 @@
-//! Module-aware signed history over the guardian WebSocket API. The direct peer
-//! envelope path deliberately retains its separate empty-registry limitation.
+//! Module-aware signed history over the guardian WebSocket API, or the Iroh API
+//! (API-002) for an Iroh federation. The direct peer envelope path deliberately
+//! retains its separate empty-registry limitation.
 use super::{
     config::RuntimeConfig,
     consensus::{HistoryQueueError, RuntimeHandle},
@@ -7,6 +8,7 @@ use super::{
 use crate::{
     api::{
         announcements::SignedAnnouncement,
+        iroh::{CallError, IrohApiClient},
         websocket::{Limits, Message, WebSocket},
     },
     codec::rpc,
@@ -14,6 +16,7 @@ use crate::{
     core::history::{HistoryVerifier, SignaturePolicy},
     crypto::secp,
     json,
+    net::iroh::IrohOptions,
     protocol::{PeerId, SignedSessionOutcome},
 };
 use sonic_rs::{JsonContainerTrait, JsonValueTrait, json};
@@ -98,6 +101,20 @@ impl CatchupEndpoint {
             addresses,
             announcement: None,
         })
+    }
+    /// Configured `iroh://<api key>` endpoint. Direct addresses, if any, come
+    /// from the Iroh options supplied to `Catchup::start_iroh`, not DNS.
+    pub fn iroh(peer: PeerId, url: CanonicalUrl) -> Result<Self, CatchupError> {
+        url.iroh_key().ok_or(CatchupError::UnsupportedTransport)?;
+        Ok(Self {
+            peer,
+            url,
+            addresses: vec![],
+            announcement: None,
+        })
+    }
+    fn usable(&self) -> bool {
+        !self.addresses.is_empty() || self.url.iroh_key().is_some()
     }
     /// The caller selects the current operational announcement using the
     /// announcement store's nonce rules. Startup verifies its peer signature;
@@ -305,6 +322,17 @@ impl Catchup {
         access_secret: Option<Zeroizing<String>>,
         options: CatchupOptions,
     ) -> Result<Self, CatchupError> {
+        Self::start_iroh(runtime, endpoints, access_secret, options, None)
+    }
+    /// As `start`, additionally permitting `iroh://` endpoints reached through a
+    /// dial-only Iroh 0.35 client configured by `iroh`.
+    pub fn start_iroh(
+        runtime: RuntimeHandle,
+        endpoints: Vec<CatchupEndpoint>,
+        access_secret: Option<Zeroizing<String>>,
+        options: CatchupOptions,
+        iroh: Option<IrohOptions>,
+    ) -> Result<Self, CatchupError> {
         let config = runtime.config().clone();
         if endpoints.is_empty()
             || options.request_timeout.is_zero()
@@ -317,13 +345,15 @@ impl Catchup {
         {
             return Err(CatchupError::InvalidConfiguration);
         }
+        let configured = config.server_config().client_api_endpoints();
         let mut peers = BTreeSet::new();
         for endpoint in &endpoints {
-            let expected = config
-                .server_config()
-                .api_endpoints
+            let expected = configured
                 .get(&endpoint.peer)
                 .ok_or(CatchupError::InvalidConfiguration)?;
+            if endpoint.url.iroh_key().is_some() && iroh.is_none() {
+                return Err(CatchupError::UnsupportedTransport);
+            }
             if endpoint.peer == config.peer() || !peers.insert(endpoint.peer) {
                 return Err(CatchupError::InvalidConfiguration);
             }
@@ -352,7 +382,7 @@ impl Catchup {
                 endpoints: endpoints
                     .into_iter()
                     .map(|endpoint| EndpointSlot {
-                        ready: !endpoint.addresses.is_empty(),
+                        ready: endpoint.usable(),
                         endpoint,
                         revision: 0,
                     })
@@ -363,6 +393,10 @@ impl Catchup {
             pause: Mutex::new(()),
             wake: Condvar::new(),
         });
+        let client = iroh
+            .map(IrohApiClient::new)
+            .transpose()
+            .map_err(|_| CatchupError::Transport)?;
         let shared = control.clone();
         let owner_config = config.clone();
         let worker = thread::Builder::new()
@@ -374,7 +408,10 @@ impl Catchup {
                         run(
                             &runtime,
                             &config,
-                            access_secret.as_ref().map(|s| s.as_str()),
+                            &Transport {
+                                secret: access_secret.as_ref().map(|s| s.as_str()),
+                                iroh: client.as_ref(),
+                            },
                             options,
                             &verifier,
                             &shared,
@@ -382,6 +419,9 @@ impl Catchup {
                     }))
                     .unwrap_or(Err(CatchupError::Worker));
                     shared.stop();
+                    if let Some(client) = client {
+                        client.close();
+                    }
                     result
                 })
             })
@@ -524,10 +564,15 @@ impl Drop for Catchup {
         let _ = self.stop_and_join();
     }
 }
+/// Per-worker transports: the WebSocket access secret and the Iroh client.
+struct Transport<'a> {
+    secret: Option<&'a str>,
+    iroh: Option<&'a IrohApiClient>,
+}
 fn fetch(
     index: u64,
     selected: &EndpointSlot,
-    secret: Option<&str>,
+    transport: &Transport<'_>,
     options: CatchupOptions,
     config: &RuntimeConfig,
     verifier: &HistoryVerifier,
@@ -538,6 +583,63 @@ fn fetch(
         .ok_or(CatchupError::InvalidConfiguration)?;
     let _guard = control.request(deadline, selected)?;
     let endpoint = &selected.endpoint;
+    let result = if let Some(key) = endpoint.url.iroh_key() {
+        let client = transport.iroh.ok_or(CatchupError::UnsupportedTransport)?;
+        client
+            .call(
+                &key,
+                "await_signed_session_outcome",
+                json!(index),
+                deadline,
+                options.max_response_bytes,
+                &|| control.check().is_err(),
+            )
+            .map_err(|error| match error {
+                CallError::Rejected => CatchupError::Rpc,
+                CallError::InvalidResponse => CatchupError::InvalidResponse,
+                _ => control.check().err().unwrap_or(match error {
+                    CallError::Timeout => CatchupError::Timeout,
+                    _ => CatchupError::Transport,
+                }),
+            })?
+    } else {
+        fetch_ws(
+            index,
+            endpoint,
+            transport.secret,
+            deadline,
+            options,
+            control,
+        )?
+    };
+    let array = result
+        .as_array()
+        .filter(|array| array.len() == 1)
+        .ok_or(CatchupError::InvalidResponse)?;
+    let hex = array[0]
+        .as_str()
+        .ok_or(CatchupError::InvalidResponse)?
+        .to_owned();
+    let signed: SignedSessionOutcome =
+        rpc::decode_hex(&[hex]).map_err(|_| CatchupError::InvalidHistory)?;
+    signed
+        .outcome
+        .validate_modules(config.modules())
+        .map_err(|_| CatchupError::InvalidHistory)?;
+    verifier
+        .verify(index, &signed, SignaturePolicy::GuardianAdoption)
+        .map_err(|_| CatchupError::InvalidHistory)?;
+    control.check()?;
+    Ok(signed)
+}
+fn fetch_ws(
+    index: u64,
+    endpoint: &CatchupEndpoint,
+    secret: Option<&str>,
+    deadline: Instant,
+    options: CatchupOptions,
+    control: &Control,
+) -> Result<sonic_rs::Value, CatchupError> {
     let mut connected = None;
     for address in &endpoint.addresses {
         control.check()?;
@@ -582,35 +684,16 @@ fn fetch(
     {
         return Err(CatchupError::InvalidResponse);
     }
-    let result = match (response.get("result"), response.get("error")) {
-        (Some(result), None) => result,
-        (None, Some(_)) => return Err(CatchupError::Rpc),
-        _ => return Err(CatchupError::InvalidResponse),
-    };
-    let array = result
-        .as_array()
-        .filter(|array| array.len() == 1)
-        .ok_or(CatchupError::InvalidResponse)?;
-    let hex = array[0]
-        .as_str()
-        .ok_or(CatchupError::InvalidResponse)?
-        .to_owned();
-    let signed: SignedSessionOutcome =
-        rpc::decode_hex(&[hex]).map_err(|_| CatchupError::InvalidHistory)?;
-    signed
-        .outcome
-        .validate_modules(config.modules())
-        .map_err(|_| CatchupError::InvalidHistory)?;
-    verifier
-        .verify(index, &signed, SignaturePolicy::GuardianAdoption)
-        .map_err(|_| CatchupError::InvalidHistory)?;
-    control.check()?;
-    Ok(signed)
+    match (response.get("result"), response.get("error")) {
+        (Some(result), None) => Ok(result.clone()),
+        (None, Some(_)) => Err(CatchupError::Rpc),
+        _ => Err(CatchupError::InvalidResponse),
+    }
 }
 fn run(
     runtime: &RuntimeHandle,
     config: &RuntimeConfig,
-    secret: Option<&str>,
+    transport: &Transport<'_>,
     options: CatchupOptions,
     verifier: &HistoryVerifier,
     control: &Control,
@@ -638,7 +721,9 @@ fn run(
             control.pause(options.retry_interval);
             continue;
         };
-        let signed = match fetch(index, &selected, secret, options, config, verifier, control) {
+        let signed = match fetch(
+            index, &selected, transport, options, config, verifier, control,
+        ) {
             Ok(signed) => signed,
             Err(CatchupError::Cancelled) => break,
             Err(CatchupError::EndpointChanged) => continue,

@@ -49,6 +49,16 @@ impl From<DecodeError> for ConfigError {
 pub struct CanonicalUrl(String);
 impl CanonicalUrl {
     pub fn simple(input: &str) -> Result<Self, ConfigError> {
+        // A non-special scheme with a host and an empty path serializes without
+        // a trailing slash. The Iroh API form is exactly 64 lowercase hex digits.
+        if let Some(key) = input.strip_prefix("iroh://") {
+            return if key.len() == 64 && key.bytes().all(|b| matches!(b, b'0'..=b'9' | b'a'..=b'f'))
+            {
+                Ok(Self(input.to_owned()))
+            } else {
+                Err(ConfigError::UnsupportedUrl)
+            };
+        }
         let (scheme, rest) = input.split_once("://").ok_or(ConfigError::UnsupportedUrl)?;
         if !matches!(scheme, "http" | "https" | "ws" | "wss" | "tcp" | "fedimint")
             || !input.is_ascii()
@@ -110,6 +120,18 @@ impl CanonicalUrl {
     }
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+    /// Client-facing Iroh API URL for an endpoint public key: `iroh://` + hex.
+    pub fn iroh(api_key: &[u8; 32]) -> Self {
+        Self(format!(
+            "iroh://{}",
+            crate::codec::text::hex_encode(api_key)
+        ))
+    }
+    /// The Iroh API endpoint key named by an `iroh://` URL, if this is one.
+    pub fn iroh_key(&self) -> Option<[u8; 32]> {
+        let hex = self.0.strip_prefix("iroh://")?;
+        crate::codec::text::hex_decode(hex).ok()?.try_into().ok()
     }
 }
 impl ConsensusEncode for CanonicalUrl {
@@ -252,9 +274,29 @@ impl RawServerConfig {
     pub fn consensus_hash(&self) -> [u8; 32] {
         sha256(&self.consensus_encode())
     }
+    /// Client-facing API endpoints. An Iroh federation leaves the TCP map empty
+    /// and advertises each guardian's API key as `iroh://<hex>` under its name;
+    /// the federation ID commits to this derived map.
+    pub fn client_api_endpoints(&self) -> BTreeMap<PeerId, Endpoint> {
+        if self.iroh_endpoints.is_empty() {
+            return self.api_endpoints.clone();
+        }
+        self.iroh_endpoints
+            .iter()
+            .map(|(peer, endpoint)| {
+                (
+                    *peer,
+                    Endpoint {
+                        url: CanonicalUrl::iroh(&endpoint.api_key),
+                        name: endpoint.name.clone(),
+                    },
+                )
+            })
+            .collect()
+    }
     pub fn client_config(&self) -> RawClientConfig {
         RawClientConfig {
-            api_endpoints: self.api_endpoints.clone(),
+            api_endpoints: self.client_api_endpoints(),
             broadcast_public_keys: Some(self.broadcast_public_keys.clone()),
             consensus_version: self.consensus_version,
             meta: self.meta.clone(),

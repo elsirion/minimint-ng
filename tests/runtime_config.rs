@@ -125,7 +125,7 @@ fn persisted(n: u16) -> PersistedSetup {
                 mint: (0..42).map(|d| (d, Scalar::from_u64(1))).collect(),
             },
         },
-        identity: identities.into_iter().next().unwrap(),
+        identity: identities.into_iter().next().unwrap().into(),
     }
 }
 fn reject(value: PersistedSetup, expected: RuntimeConfigError) {
@@ -151,7 +151,7 @@ fn four_guardian_profile_constructs_closed_modules_tls_and_protected_session_fac
         runtime.session_config().unwrap().local_key.public_key(),
         session.local_key.public_key()
     );
-    let _tls = runtime.tls_config();
+    let _tls = runtime.tls_config().unwrap();
     let resolved = runtime.resolve_peer_addresses().unwrap();
     assert_eq!(resolved.len(), 3);
     assert!(!resolved.contains_key(&PeerId(0)));
@@ -320,7 +320,7 @@ fn wallet_membership_network_and_exact_payload_are_checked() {
 #[test]
 fn tls_identity_and_retained_public_binding_fail_closed() {
     let mut value = persisted(1);
-    value.identity = Identity::generate("other").unwrap();
+    value.identity = Identity::generate("other").unwrap().into();
     reject(value, RuntimeConfigError::InvalidTls);
     let mut value = persisted(4);
     value

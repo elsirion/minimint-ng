@@ -151,7 +151,7 @@ pub fn configs(n: u16, rounds: u16, listeners: &[TcpListener]) -> Vec<Arc<Runtim
                             mint: (0..42).map(|d| (d, share(p as u16))).collect(),
                         },
                     },
-                    identity,
+                    identity: identity.into(),
                 })
                 .unwrap(),
             )

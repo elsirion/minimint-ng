@@ -561,7 +561,7 @@ fn monetary_catchup_child() {
     let network = Network(Some(Arc::new(
         PeerNetwork::start(
             PeerId(0),
-            config.tls_config(),
+            config.tls_config().unwrap(),
             config.resolve_peer_addresses().unwrap(),
             listeners.remove(0),
             64,

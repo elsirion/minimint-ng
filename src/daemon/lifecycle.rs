@@ -1,11 +1,13 @@
-//! Setup-to-runtime ownership boundary for the regtest/signet TCP/WS profile.
-//! DNS is a caller responsibility; advertised URLs are validated, never rewritten.
+//! Setup-to-runtime ownership boundary for the regtest/signet profile over
+//! either the TCP/mTLS + WS or the Iroh transport. DNS is a caller
+//! responsibility; advertised URLs are validated, never rewritten.
 use super::config::{RuntimeConfig, RuntimeConfigError, tcp_authority};
 use crate::{
     api::setup::GenerationJob,
     config::{self, BitcoinNetwork, CanonicalUrl, SetupEndpoints, SetupRecord},
     net::{
-        PeerNetwork, TransportError,
+        PeerNetwork, TransportError, TransportIdentity,
+        iroh::{IrohIdentity, IrohOptions},
         tls::{PeerCertificate, TlsConfig},
     },
     protocol::PeerId,
@@ -26,6 +28,34 @@ use std::{
 pub struct AdvertisedEndpoints {
     pub api: CanonicalUrl,
     pub p2p: CanonicalUrl,
+}
+/// The transport this process was started with. Stored configuration must
+/// match it; a restart never silently switches transport.
+#[derive(Clone)]
+pub enum ExpectedTransport {
+    Tcp(AdvertisedEndpoints),
+    Iroh,
+}
+impl From<AdvertisedEndpoints> for ExpectedTransport {
+    fn from(endpoints: AdvertisedEndpoints) -> Self {
+        Self::Tcp(endpoints)
+    }
+}
+impl From<&AdvertisedEndpoints> for ExpectedTransport {
+    fn from(endpoints: &AdvertisedEndpoints) -> Self {
+        Self::Tcp(endpoints.clone())
+    }
+}
+impl From<&ExpectedTransport> for ExpectedTransport {
+    fn from(expected: &ExpectedTransport) -> Self {
+        expected.clone()
+    }
+}
+/// Remote guardian reachability derived from validated setup records.
+enum Remote {
+    Tcp(BTreeMap<PeerId, CanonicalUrl>),
+    /// Every guardian's P2P key, including the local one.
+    Iroh(BTreeMap<PeerId, [u8; 32]>),
 }
 #[derive(Debug)]
 pub enum LifecycleError {
@@ -66,28 +96,21 @@ impl From<TransportError> for LifecycleError {
 fn profile(
     records: &BTreeMap<PeerId, SetupRecord>,
     local: PeerId,
-    expected: &AdvertisedEndpoints,
-) -> Result<BTreeMap<PeerId, CanonicalUrl>, LifecycleError> {
+    expected: &ExpectedTransport,
+) -> Result<Remote, LifecycleError> {
     config::validate_setup_set(records).map_err(|_| LifecycleError::InvalidProfile)?;
     if !(records.len() == 1 || (4..=20).contains(&records.len())) {
         return Err(LifecycleError::InvalidProfile);
     }
     let modules = BTreeSet::from(["mintv2".to_owned(), "walletv2".to_owned()]);
-    let mut remote = BTreeMap::new();
+    let mut urls = BTreeMap::new();
+    let mut keys = BTreeMap::new();
     let mut found_local = false;
     for (peer, record) in records {
-        let SetupEndpoints::Tcp {
-            api_url, p2p_url, ..
-        } = &record.endpoints
-        else {
-            return Err(LifecycleError::InvalidProfile);
-        };
         if !matches!(
             record.network,
             BitcoinNetwork::Regtest | BitcoinNetwork::Signet
-        ) || !api_url.as_str().starts_with("ws://")
-            || tcp_authority(p2p_url).is_err()
-            || config::normalize_release(&record.release) != "0.13.0"
+        ) || config::normalize_release(&record.release) != "0.13.0"
             || record
                 .enabled_modules
                 .as_ref()
@@ -95,19 +118,41 @@ fn profile(
         {
             return Err(LifecycleError::InvalidProfile);
         }
-        if *peer == local {
-            found_local = true;
-            if api_url != &expected.api || p2p_url != &expected.p2p {
-                return Err(LifecycleError::InvalidProfile);
+        found_local |= *peer == local;
+        match (&record.endpoints, expected) {
+            (
+                SetupEndpoints::Tcp {
+                    api_url, p2p_url, ..
+                },
+                ExpectedTransport::Tcp(expected),
+            ) => {
+                if !api_url.as_str().starts_with("ws://") || tcp_authority(p2p_url).is_err() {
+                    return Err(LifecycleError::InvalidProfile);
+                }
+                if *peer == local {
+                    if api_url != &expected.api || p2p_url != &expected.p2p {
+                        return Err(LifecycleError::InvalidProfile);
+                    }
+                } else {
+                    urls.insert(*peer, p2p_url.clone());
+                }
             }
-        } else {
-            remote.insert(*peer, p2p_url.clone());
+            (SetupEndpoints::Iroh { p2p_key, .. }, ExpectedTransport::Iroh) => {
+                if keys.values().any(|key| key == p2p_key) {
+                    return Err(LifecycleError::InvalidProfile);
+                }
+                keys.insert(*peer, *p2p_key);
+            }
+            _ => return Err(LifecycleError::InvalidProfile),
         }
     }
     if !found_local {
         return Err(LifecycleError::InvalidProfile);
     }
-    Ok(remote)
+    Ok(match expected {
+        ExpectedTransport::Tcp(_) => Remote::Tcp(urls),
+        ExpectedTransport::Iroh => Remote::Iroh(keys),
+    })
 }
 fn exact_addresses(
     urls: &BTreeMap<PeerId, CanonicalUrl>,
@@ -127,43 +172,88 @@ fn exact_addresses(
     }
     Ok(())
 }
+enum PlanTransport {
+    Tcp(TlsConfig),
+    Iroh {
+        identity: IrohIdentity,
+        keys: BTreeMap<PeerId, [u8; 32]>,
+    },
+}
 /// Pure validated endpoint collection plus confidential generation input. No DNS,
 /// sockets, persistence, or worker starts occur until start(). No Debug on secrets.
 pub struct SetupPlan {
     job: GenerationJob,
-    tls: TlsConfig,
+    transport: PlanTransport,
+    /// Remote TCP URLs; empty for Iroh, whose peers are identified by key.
     remote: BTreeMap<PeerId, CanonicalUrl>,
-    expected: AdvertisedEndpoints,
+    expected: ExpectedTransport,
 }
 impl SetupPlan {
-    pub fn new(job: GenerationJob, expected: &AdvertisedEndpoints) -> Result<Self, LifecycleError> {
-        let remote = profile(&job.inputs.records, job.inputs.peer, expected)?;
-        let mut certificates = BTreeMap::new();
-        for (peer, record) in &job.inputs.records {
-            let SetupEndpoints::Tcp { certificate, .. } = &record.endpoints else {
-                return Err(LifecycleError::InvalidProfile);
-            };
-            if *peer == job.inputs.peer && job.identity.certificate_der()? != *certificate {
-                return Err(LifecycleError::InvalidProfile);
+    pub fn new(
+        job: GenerationJob,
+        expected: impl Into<ExpectedTransport>,
+    ) -> Result<Self, LifecycleError> {
+        let expected = expected.into();
+        let (transport, remote) = match profile(&job.inputs.records, job.inputs.peer, &expected)? {
+            Remote::Tcp(remote) => {
+                let TransportIdentity::Tls(identity) = &job.identity else {
+                    return Err(LifecycleError::InvalidProfile);
+                };
+                let mut certificates = BTreeMap::new();
+                for (peer, record) in &job.inputs.records {
+                    let SetupEndpoints::Tcp { certificate, .. } = &record.endpoints else {
+                        return Err(LifecycleError::InvalidProfile);
+                    };
+                    if *peer == job.inputs.peer && identity.certificate_der()? != *certificate {
+                        return Err(LifecycleError::InvalidProfile);
+                    }
+                    certificates.insert(
+                        *peer,
+                        PeerCertificate {
+                            name: record.name.clone(),
+                            certificate_der: certificate.clone(),
+                        },
+                    );
+                }
+                (
+                    PlanTransport::Tcp(TlsConfig::new(identity, certificates)?),
+                    remote,
+                )
             }
-            certificates.insert(
-                *peer,
-                PeerCertificate {
-                    name: record.name.clone(),
-                    certificate_der: certificate.clone(),
-                },
-            );
-        }
-        let tls = TlsConfig::new(&job.identity, certificates)?;
+            Remote::Iroh(keys) => {
+                let TransportIdentity::Iroh(identity) = &job.identity else {
+                    return Err(LifecycleError::InvalidProfile);
+                };
+                let local = &job.inputs.records[&job.inputs.peer].endpoints;
+                if local
+                    != &(SetupEndpoints::Iroh {
+                        api_key: identity.api_public(),
+                        p2p_key: identity.p2p_public(),
+                    })
+                {
+                    return Err(LifecycleError::InvalidProfile);
+                }
+                (
+                    PlanTransport::Iroh {
+                        identity: identity.clone(),
+                        keys,
+                    },
+                    BTreeMap::new(),
+                )
+            }
+        };
         Ok(Self {
             job,
-            tls,
+            transport,
             remote,
-            expected: expected.clone(),
+            expected,
         })
     }
     pub fn peer_urls(&self) -> &BTreeMap<PeerId, CanonicalUrl> {
         &self.remote
+    }
+    pub fn is_iroh(&self) -> bool {
+        matches!(self.transport, PlanTransport::Iroh { .. })
     }
     /// The caller resolves each returned advertised authority and supplies exactly
     /// its remote peer IDs. Listener binding is independent of advertised addresses.
@@ -175,17 +265,57 @@ impl SetupPlan {
         resolved: BTreeMap<PeerId, SocketAddr>,
         queue_capacity: usize,
     ) -> Result<Generation, LifecycleError> {
+        let PlanTransport::Tcp(tls) = &self.transport else {
+            return Err(LifecycleError::InvalidProfile);
+        };
         exact_addresses(&self.remote, &resolved)?;
         if setup::load_generated(&store)?.is_some() {
             return Err(LifecycleError::Persistence(PersistenceError::AlreadyStored));
         }
-        let network = Arc::new(PeerNetwork::start(
+        let network = PeerNetwork::start(
             self.job.inputs.peer,
-            self.tls,
+            tls.clone(),
             resolved,
             listener,
             queue_capacity,
-        )?);
+        )?;
+        self.spawn(store, network)
+    }
+    /// Iroh variant: binds the guardian P2P endpoint (UDP) at `bind`. Peers are
+    /// the committed setup keys; `options` only chooses discovery and routing.
+    pub fn start_iroh(
+        self,
+        store: Store,
+        bind: SocketAddr,
+        options: IrohOptions,
+        queue_capacity: usize,
+    ) -> Result<Generation, LifecycleError> {
+        let PlanTransport::Iroh { identity, keys } = &self.transport else {
+            return Err(LifecycleError::InvalidProfile);
+        };
+        if setup::load_generated(&store)?.is_some() {
+            return Err(LifecycleError::Persistence(PersistenceError::AlreadyStored));
+        }
+        let network = PeerNetwork::start_iroh(
+            self.job.inputs.peer,
+            identity,
+            keys.clone(),
+            bind,
+            options,
+            queue_capacity,
+        )?;
+        self.spawn(store, network)
+    }
+    fn spawn(self, store: Store, network: PeerNetwork) -> Result<Generation, LifecycleError> {
+        let network = Arc::new(network);
+        let remote_peers: Vec<PeerId> = self
+            .job
+            .inputs
+            .records
+            .keys()
+            .copied()
+            .filter(|peer| *peer != self.job.inputs.peer)
+            .collect();
         let cancelled = Arc::new(AtomicBool::new(false));
         let worker_network = network.clone();
         let worker_cancelled = cancelled.clone();
@@ -194,7 +324,7 @@ impl SetupPlan {
             .spawn(move || {
                 let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
                     let mut transport =
-                        PeerSetupTransport::new(&worker_network, self.remote.keys().copied());
+                        PeerSetupTransport::new(&worker_network, remote_peers.iter().copied());
                     let generated = setup::generate(
                         self.job.inputs.peer,
                         &self.job.inputs.records,
@@ -338,11 +468,34 @@ impl RestoredSetup {
         queue_capacity: usize,
     ) -> Result<ReadyRuntime, LifecycleError> {
         exact_addresses(self.peer_urls(), &resolved)?;
-        let network = PeerNetwork::start(
+        let tls = self
+            .config
+            .tls_config()
+            .ok_or(LifecycleError::InvalidProfile)?;
+        let network =
+            PeerNetwork::start(self.config.peer(), tls, resolved, listener, queue_capacity)?;
+        Ok(ReadyRuntime {
+            config: self.config,
+            network: Arc::new(network),
+        })
+    }
+    /// Iroh variant of `connect`, binding the stored P2P identity at `bind`.
+    pub fn connect_iroh(
+        self,
+        bind: SocketAddr,
+        options: IrohOptions,
+        queue_capacity: usize,
+    ) -> Result<ReadyRuntime, LifecycleError> {
+        let (identity, keys) = self
+            .config
+            .iroh_peers()
+            .ok_or(LifecycleError::InvalidProfile)?;
+        let network = PeerNetwork::start_iroh(
             self.config.peer(),
-            self.config.tls_config(),
-            resolved,
-            listener,
+            identity,
+            keys.clone(),
+            bind,
+            options,
             queue_capacity,
         )?;
         Ok(ReadyRuntime {
@@ -353,15 +506,16 @@ impl RestoredSetup {
 }
 pub fn load(
     store: &Store,
-    expected: &AdvertisedEndpoints,
+    expected: impl Into<ExpectedTransport>,
 ) -> Result<Option<RestoredSetup>, LifecycleError> {
+    let expected = expected.into();
     let Some(persisted) = setup::load_generated(store)? else {
         return Ok(None);
     };
     profile(
         &persisted.generated.setup_records,
         persisted.generated.peer,
-        expected,
+        &expected,
     )?;
     let config = RuntimeConfig::from_persisted(persisted).map_err(LifecycleError::Config)?;
     Ok(Some(RestoredSetup {

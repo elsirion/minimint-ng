@@ -479,7 +479,7 @@ fn generated_private_configuration_is_atomic_validated_and_reopens() {
         assert!(load_generated(&store).unwrap().is_none());
         let wrong = minimint_ng::net::tls::Identity::generate("Wrong").unwrap();
         assert!(matches!(
-            persist_generated(&store, &generated, &wrong),
+            persist_generated(&store, &generated, &wrong.into()),
             Err(PersistenceError::InvalidConfiguration)
         ));
         assert!(load_generated(&store).unwrap().is_none());
@@ -654,7 +654,13 @@ fn four_guardians_generate_over_authenticated_tcp_and_shutdown_unblocks_setup() 
     for config in &generated {
         let directory = storage_fixture::TestDir::new();
         let store = minimint_ng::storage::Store::open(directory.path()).unwrap();
-        persist_generated(&store, config, &identities[usize::from(config.peer.0)]).unwrap();
+        let source = &identities[usize::from(config.peer.0)];
+        let identity = Identity::from_der(
+            &source.certificate_der().unwrap(),
+            &source.private_key_der().unwrap(),
+        )
+        .unwrap();
+        persist_generated(&store, config, &identity.into()).unwrap();
         let restored = load_generated(&store).unwrap().unwrap();
         assert_eq!(restored.generated.server, config.server);
         assert_eq!(restored.generated.setup_records, config.setup_records);

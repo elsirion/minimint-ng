@@ -23,7 +23,8 @@ def identity(package):
     return package['name'], package['version'], package.get('source')
 
 
-def closure(packages):
+def closure(packages, excluded=frozenset()):
+    """Engine-reachable identities; `excluded` lock edges (from, to) are not followed."""
     selected = {}
     roots = [p for p in packages if p['name'] == 'fedimint-aleph-bft' and p['version'] == '0.36.0']
     if len(roots) != 1:
@@ -35,14 +36,40 @@ def closure(packages):
             continue
         selected[identity(p)] = p
         for dependency in p.get('dependencies', []):
-            parts = dependency.split(' ', 2)
-            matches = [q for q in packages if q['name'] == parts[0]
-                       and (len(parts) < 2 or q['version'] == parts[1])
-                       and (len(parts) < 3 or q.get('source') == parts[2].strip('()'))]
-            if len(matches) != 1:
-                raise ValueError(f'ambiguous or missing baseline dependency: {dependency}')
-            todo.extend(matches)
+            match = resolve(packages, dependency)
+            if (identity(p)[:2], identity(match)[:2]) not in excluded:
+                todo.append(match)
     return selected
+
+
+def resolve(packages, dependency):
+    parts = dependency.split(' ', 2)
+    matches = [q for q in packages if q['name'] == parts[0]
+               and (len(parts) < 2 or q['version'] == parts[1])
+               and (len(parts) < 3 or q.get('source') == parts[2].strip('()'))]
+    if len(matches) != 1:
+        raise ValueError(f'ambiguous or missing baseline dependency: {dependency}')
+    return matches[0]
+
+
+def gated_edges(reviews, baseline, errors):
+    """Lock edges an exact review declares target-gated to a platform the guardian
+    never builds. Each edge must exist in the baseline resolution, so only paths
+    the baseline itself carries can be set aside; the remaining closure is still
+    compared identity by identity."""
+    edges = set()
+    for review in reviews:
+        for edge in review.get('target_gated_edges', []):
+            source, target = tuple(edge.get('from', ())), tuple(edge.get('to', ()))
+            origin = [p for p in baseline if identity(p)[:2] == source]
+            if (len(source) != 2 or len(target) != 2 or not edge.get('target')
+                    or not review.get('reason') or len(origin) != 1
+                    or not any(identity(resolve(baseline, d))[:2] == target
+                               for d in origin[0].get('dependencies', []))):
+                errors.append(f'invalid target-gated edge review: {identity(review)}')
+                continue
+            edges.add((source, target))
+    return frozenset(edges)
 
 
 def seed():
@@ -100,9 +127,18 @@ def check(metadata_path=None):
     review_path = ROOT / 'vendor-metadata/reviewed-extra-versions.json'
     reviews = json.loads(review_path.read_text()) if review_path.exists() else []
     reviewed = {identity(p): p for p in reviews}
+    # Identities reachable from the engine only through a reviewed target-gated
+    # edge (never compiled for the guardian platform) may differ from baseline
+    # when their own exact review records that edge.
+    excluded = gated_edges(reviews, baseline, errors)
+    host = closure(actual, excluded)
     for key, package in active.items():
+        approval = reviewed.get(key)
         if key not in required:
-            errors.append(f'agreement dependency outside baseline: {key}')
+            if (key in host or not approval or not approval.get('reason')
+                    or not approval.get('target_gated_edges')
+                    or approval.get('checksum') != package.get('checksum')):
+                errors.append(f'agreement dependency outside baseline: {key}')
         elif package.get('checksum') != required[key].get('checksum'):
             errors.append(f'checksum differs for {key}')
     names = {p['name'] for p in baseline}
@@ -130,7 +166,7 @@ def check(metadata_path=None):
             approval = reviewed.get(key)
             # An exception can permit an unrelated library's parallel version,
             # never an upgrade inside the mandatory agreement closure.
-            if (key in active or not approval or not approval.get('reason')
+            if (key in host or not approval or not approval.get('reason')
                     or approval.get('checksum') != p.get('checksum')):
                 errors.append(f'extra version of agreement dependency needs review: {key}')
     print(json.dumps({'baseline_sha256': hashlib.sha256(BASELINE.read_bytes()).hexdigest(),

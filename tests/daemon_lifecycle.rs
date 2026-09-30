@@ -54,7 +54,7 @@ fn jobs(n: u16, addresses: &BTreeMap<PeerId, SocketAddr>) -> Vec<GenerationJob> 
                 peer: PeerId(p as u16),
                 records: records.clone(),
             },
-            identity,
+            identity: identity.into(),
         })
         .collect()
 }

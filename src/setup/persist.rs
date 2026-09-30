@@ -4,7 +4,7 @@ use crate::{
     codec::{ConsensusDecode, ConsensusEncode, Reader, decode_whole},
     config::{self, RawMintConfig, RawServerConfig, RawWalletConfig},
     crypto::{bls::Scalar, secp::SecretKey},
-    net::tls::Identity,
+    net::{TransportIdentity, iroh::IrohIdentity, tls::Identity},
     protocol::{ModuleId, PeerId},
     storage::{Namespace, Store, StoreError},
 };
@@ -34,20 +34,27 @@ impl From<StoreError> for PersistenceError {
 }
 pub struct PersistedSetup {
     pub generated: GeneratedConfig,
-    pub identity: Identity,
+    pub identity: TransportIdentity,
 }
 const KEY: &[u8] = b"setup/generated/v1";
+/// Record layout versions: 1 ends with the TLS certificate and PKCS#8 key; 2
+/// ends with the Iroh API and P2P endpoint secrets. Earlier fields are shared.
+const TLS_RECORD: u8 = 1;
+const IROH_RECORD: u8 = 2;
 fn validate_local(
     generated: &GeneratedConfig,
-    identity: &Identity,
+    identity: &TransportIdentity,
 ) -> Result<(), PersistenceError> {
     let invalid = || PersistenceError::InvalidConfiguration;
     let server = &generated.server;
     config::validate_setup_set(&generated.setup_records).map_err(|_| invalid())?;
-    if server.api_endpoints.len() != generated.setup_records.len()
-        || server.tls_certificates.len() != generated.setup_records.len()
-        || server.broadcast_public_keys.len() != generated.setup_records.len()
-        || !server.iroh_endpoints.is_empty()
+    let n = generated.setup_records.len();
+    let tcp = matches!(identity, TransportIdentity::Tls(_));
+    let (tcp_entries, iroh_entries) = if tcp { (n, 0) } else { (0, n) };
+    if server.api_endpoints.len() != tcp_entries
+        || server.tls_certificates.len() != tcp_entries
+        || server.iroh_endpoints.len() != iroh_entries
+        || server.broadcast_public_keys.len() != n
     {
         return Err(invalid());
     }
@@ -56,23 +63,35 @@ fn validate_local(
             server.broadcast_public_keys.get(peer).ok_or_else(invalid)?,
         )
         .map_err(|_| invalid())?;
-        let config::SetupEndpoints::Tcp {
-            api_url,
-            certificate,
-            ..
-        } = &record.endpoints
-        else {
-            return Err(invalid());
-        };
-        if server.api_endpoints.get(peer)
-            != Some(&config::Endpoint {
-                url: api_url.clone(),
-                name: record.name.clone(),
-            })
-            || server.tls_certificates.get(peer)
-                != Some(&crate::codec::text::hex_encode(certificate))
-        {
-            return Err(invalid());
+        match &record.endpoints {
+            config::SetupEndpoints::Tcp {
+                api_url,
+                certificate,
+                ..
+            } if tcp => {
+                if server.api_endpoints.get(peer)
+                    != Some(&config::Endpoint {
+                        url: api_url.clone(),
+                        name: record.name.clone(),
+                    })
+                    || server.tls_certificates.get(peer)
+                        != Some(&crate::codec::text::hex_encode(certificate))
+                {
+                    return Err(invalid());
+                }
+            }
+            config::SetupEndpoints::Iroh { api_key, p2p_key } if !tcp => {
+                if server.iroh_endpoints.get(peer)
+                    != Some(&config::IrohEndpoint {
+                        name: record.name.clone(),
+                        api_key: *api_key,
+                        p2p_key: *p2p_key,
+                    })
+                {
+                    return Err(invalid());
+                }
+            }
+            _ => return Err(invalid()),
         }
     }
     if server.consensus_version != config::CORE_CONSENSUS
@@ -82,11 +101,24 @@ fn validate_local(
     {
         return Err(invalid());
     }
-    let certificate = identity.certificate_der().map_err(|_| invalid())?;
-    if server.tls_certificates.get(&generated.peer)
-        != Some(&crate::codec::text::hex_encode(&certificate))
-    {
-        return Err(invalid());
+    match identity {
+        TransportIdentity::Tls(identity) => {
+            let certificate = identity.certificate_der().map_err(|_| invalid())?;
+            if server.tls_certificates.get(&generated.peer)
+                != Some(&crate::codec::text::hex_encode(&certificate))
+            {
+                return Err(invalid());
+            }
+        }
+        TransportIdentity::Iroh(identity) => {
+            let local = server
+                .iroh_endpoints
+                .get(&generated.peer)
+                .ok_or_else(invalid)?;
+            if local.api_key != identity.api_public() || local.p2p_key != identity.p2p_public() {
+                return Err(invalid());
+            }
+        }
     }
     let mint = server
         .modules
@@ -117,15 +149,20 @@ fn validate_local(
     .map_err(|_| invalid())?;
     Ok(())
 }
-/// One synced transaction contains public config, TLS identity and all generated
-/// secrets. Restricted Store directory protects bytes; encryption is not claimed.
+/// One synced transaction contains public config, transport identity and all
+/// generated secrets. Restricted Store directory protects bytes; encryption is
+/// not claimed.
 pub fn persist_generated(
     store: &Store,
     generated: &GeneratedConfig,
-    identity: &Identity,
+    identity: &TransportIdentity,
 ) -> Result<(), PersistenceError> {
     validate_local(generated, identity)?;
-    let mut bytes = Zeroizing::new(vec![1u8]);
+    let version = match identity {
+        TransportIdentity::Tls(_) => TLS_RECORD,
+        TransportIdentity::Iroh(_) => IROH_RECORD,
+    };
+    let mut bytes = Zeroizing::new(vec![version]);
     bytes.extend(generated.server.consensus_encode());
     bytes.extend(generated.setup_records.consensus_encode());
     bytes.extend(generated.peer.consensus_encode());
@@ -136,19 +173,26 @@ pub fn persist_generated(
         bytes.push(*d);
         bytes.extend_from_slice(Zeroizing::new(secret.to_bytes()).as_slice());
     }
-    bytes.extend(
-        identity
-            .certificate_der()
-            .map_err(|_| PersistenceError::InvalidConfiguration)?
-            .consensus_encode(),
-    );
-    let private = Zeroizing::new(
-        identity
-            .private_key_der()
-            .map_err(|_| PersistenceError::InvalidConfiguration)?,
-    );
-    bytes.extend((private.len() as u64).consensus_encode());
-    bytes.extend_from_slice(&private);
+    match identity {
+        TransportIdentity::Tls(identity) => {
+            bytes.extend(
+                identity
+                    .certificate_der()
+                    .map_err(|_| PersistenceError::InvalidConfiguration)?
+                    .consensus_encode(),
+            );
+            let private = Zeroizing::new(
+                identity
+                    .private_key_der()
+                    .map_err(|_| PersistenceError::InvalidConfiguration)?,
+            );
+            bytes.extend((private.len() as u64).consensus_encode());
+            bytes.extend_from_slice(&private);
+        }
+        TransportIdentity::Iroh(identity) => {
+            bytes.extend_from_slice(identity.secret_bytes().as_slice());
+        }
+    }
     let mut tx = store.transaction()?;
     if tx.get(Namespace::Local, KEY)?.is_some() {
         return Err(PersistenceError::AlreadyStored);
@@ -167,7 +211,8 @@ pub fn load_generated(store: &Store) -> Result<Option<PersistedSetup>, Persisten
 fn decode_stored(bytes: &[u8]) -> Result<PersistedSetup, PersistenceError> {
     let corrupt = || PersistenceError::CorruptRecord;
     let mut r = Reader::new(bytes);
-    if r.byte().map_err(|_| corrupt())? != 1 {
+    let version = r.byte().map_err(|_| corrupt())?;
+    if !matches!(version, TLS_RECORD | IROH_RECORD) {
         return Err(corrupt());
     }
     let server = RawServerConfig::consensus_decode(&mut r).map_err(|_| corrupt())?;
@@ -189,10 +234,20 @@ fn decode_stored(bytes: &[u8]) -> Result<PersistedSetup, PersistenceError> {
         .map_err(|_| corrupt())?
         .into_iter()
         .collect();
-    let certificate = r.bytes().map_err(|_| corrupt())?;
-    let private = r.bytes().map_err(|_| corrupt())?;
+    let identity: TransportIdentity = if version == TLS_RECORD {
+        let certificate = r.bytes().map_err(|_| corrupt())?;
+        let private = r.bytes().map_err(|_| corrupt())?;
+        Identity::from_der(certificate, private)
+            .map_err(|_| corrupt())?
+            .into()
+    } else {
+        let api = Zeroizing::new(r.array::<32>().map_err(|_| corrupt())?);
+        let p2p = Zeroizing::new(r.array::<32>().map_err(|_| corrupt())?);
+        IrohIdentity::from_secret_bytes(&api, &p2p)
+            .map_err(|_| corrupt())?
+            .into()
+    };
     r.finish().map_err(|_| corrupt())?;
-    let identity = Identity::from_der(certificate, private).map_err(|_| corrupt())?;
     let generated = GeneratedConfig {
         server,
         setup_records,

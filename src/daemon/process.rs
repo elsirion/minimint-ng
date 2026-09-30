@@ -3,16 +3,19 @@
 use super::{
     bitcoin::Backend,
     catchup::{Catchup, CatchupEndpoint, CatchupError, CatchupOptions},
-    config::tcp_authority,
+    config::{RuntimeConfig, tcp_authority},
     consensus::{Runtime, RuntimeHandle, RuntimeOptions},
-    lifecycle::{self, AdvertisedEndpoints, Generation, ReadyRuntime, SetupPlan},
-    options::{BitcoinSource, Options, read_secret},
+    lifecycle::{
+        self, AdvertisedEndpoints, ExpectedTransport, Generation, ReadyRuntime, SetupPlan,
+    },
+    options::{BitcoinSource, IrohSettings, Options, TransportOptions, read_secret},
     service::{RunningApi, RunningApiOptions, Service},
     shutdown::Shutdown,
 };
 use crate::{
     api::{
         announcements::{AnnouncementApi, SignedAnnouncement},
+        iroh::IrohApiServer,
         server::Server,
         setup::SetupApi,
         websocket::Limits,
@@ -23,7 +26,10 @@ use crate::{
         rpc::CoreRpc,
     },
     config::{ApiVersions, CanonicalUrl, CoreSupport, ModuleSupport, SupportSummary},
-    net::PeerNetwork,
+    net::{
+        PeerNetwork,
+        iroh::{IrohIdentity, IrohOptions},
+    },
     protocol::PeerId,
     setup::SetupState,
     storage::Store,
@@ -53,6 +59,7 @@ const TICK: Duration = Duration::from_millis(10);
 struct Owners {
     stop: Arc<AtomicBool>,
     server: Option<Server>,
+    iroh_api: Option<IrohApiServer>,
     generation: Option<Generation>,
     catchup: Option<Catchup>,
     runtime: Option<Runtime>,
@@ -68,6 +75,9 @@ impl Owners {
         if let Some(server) = &self.server {
             server.request_shutdown();
         }
+        if let Some(server) = &self.iroh_api {
+            server.request_shutdown();
+        }
         if let Some(generation) = &self.generation {
             generation.request_shutdown();
         }
@@ -80,6 +90,9 @@ impl Owners {
         // Native agreement retains its pump and peer connections until joined.
         let mut failed = false;
         if let Some(server) = self.server.take() {
+            failed |= server.shutdown().is_err();
+        }
+        if let Some(server) = self.iroh_api.take() {
             failed |= server.shutdown().is_err();
         }
         if let Some(catchup) = self.catchup.take() {
@@ -109,6 +122,10 @@ impl Owners {
     }
     fn check(&self) -> Result<(), ProcessError> {
         if self.server.as_ref().is_some_and(Server::is_finished)
+            || self
+                .iroh_api
+                .as_ref()
+                .is_some_and(IrohApiServer::is_finished)
             || self.runtime.as_ref().is_some_and(Runtime::is_finished)
             || self.catchup.as_ref().is_some_and(Catchup::is_finished)
             || self.handle.as_ref().is_some_and(RuntimeHandle::is_stopped)
@@ -200,8 +217,32 @@ fn bitcoin_backend(source: &BitcoinSource) -> Result<Backend, ProcessError> {
         .map_err(invalid),
     }
 }
+/// Iroh address overrides are public; the file is bounded like other local input.
+fn iroh_options(settings: &IrohSettings) -> Result<IrohOptions, ProcessError> {
+    use std::io::Read;
+    const MAXIMUM: u64 = 1024 * 1024;
+    let addresses = match &settings.address_file {
+        None => BTreeMap::new(),
+        Some(path) => {
+            let mut bytes = Vec::new();
+            std::fs::File::open(path)
+                .and_then(|file| file.take(MAXIMUM + 1).read_to_end(&mut bytes))
+                .map_err(|_| ProcessError("Cannot read Iroh address file"))?;
+            if bytes.len() as u64 > MAXIMUM {
+                return Err(ProcessError("Iroh address file too large"));
+            }
+            IrohOptions::parse_addresses(&bytes)
+                .map_err(|_| ProcessError("Invalid Iroh address file"))?
+        }
+    };
+    Ok(IrohOptions {
+        discovery: settings.discovery,
+        addresses,
+    })
+}
 struct Context<'a> {
     options: &'a Options,
+    iroh: Option<IrohOptions>,
     store: Store,
     backend: Arc<Backend>,
     admin: Zeroizing<String>,
@@ -289,11 +330,16 @@ impl Context<'_> {
             .map_err(|_| ProcessError("Guardian stored announcement invalid"))?;
         drop(startup);
         let mut endpoints = vec![];
-        for (peer, endpoint) in &server.api_endpoints {
+        for (peer, endpoint) in &server.client_api_endpoints() {
             if *peer == config.peer() {
                 continue;
             }
-            let target = if let Some(announcement) = announcements.get(peer) {
+            let target = if config.is_iroh() {
+                // Signed operational overrides name WebSocket URLs; an Iroh
+                // federation keeps its committed endpoint keys for catch-up.
+                CatchupEndpoint::iroh(*peer, endpoint.url.clone())
+                    .map_err(|_| ProcessError("Guardian catch-up endpoint invalid"))?
+            } else if let Some(announcement) = announcements.get(peer) {
                 // A stored operational override is authoritative even while
                 // unavailable. Start parked, then resolve in the refresh loop.
                 CatchupEndpoint::pending_announcement(*peer, announcement.clone())
@@ -309,11 +355,12 @@ impl Context<'_> {
         }
         if !endpoints.is_empty() {
             owners.catchup = Some(
-                Catchup::start(
+                Catchup::start_iroh(
                     handle,
                     endpoints,
                     self.access.clone(),
                     CatchupOptions::default(),
+                    self.iroh.clone().filter(|_| config.is_iroh()),
                 )
                 .map_err(|_| ProcessError("Guardian catch-up startup failed"))?,
             );
@@ -323,7 +370,27 @@ impl Context<'_> {
         Ok(Arc::new(api))
     }
 
+    /// Serves the installed service over the Iroh API (API-002) using the
+    /// stored API identity, bound on the API address (UDP).
+    fn start_iroh_api(
+        &self,
+        config: &RuntimeConfig,
+        service: &Arc<Service>,
+        owners: &mut Owners,
+    ) -> Result<(), ProcessError> {
+        let (Some(options), Some((identity, _))) = (&self.iroh, config.iroh_peers()) else {
+            return Ok(());
+        };
+        owners.iroh_api = Some(
+            IrohApiServer::start(identity, self.options.api_bind, options, service.clone())
+                .map_err(|_| ProcessError("Iroh API listener startup failed"))?,
+        );
+        Ok(())
+    }
     fn refresh_catchup(&self, owners: &mut Owners) -> Result<(), ProcessError> {
+        if self.iroh.is_some() {
+            return Ok(());
+        }
         let (Some(catchup), Some(updates)) = (&owners.catchup, &owners.announcements) else {
             return Ok(());
         };
@@ -388,6 +455,7 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
     let mut owners = Owners {
         stop: shutdown.flag(),
         server: None,
+        iroh_api: None,
         generation: None,
         catchup: None,
         runtime: None,
@@ -415,12 +483,45 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
         // Keep the final database owner outside the fallible startup closure;
         // it can only be released after the shutdown watchdog is armed.
         owners.store = Some(store.clone());
-        let expected = AdvertisedEndpoints {
-            api: options.api_url.clone(),
-            p2p: options.p2p_url.clone(),
+        let (expected, iroh, preset) = match &options.transport {
+            TransportOptions::Tcp { api_url, p2p_url } => (
+                ExpectedTransport::Tcp(AdvertisedEndpoints {
+                    api: api_url.clone(),
+                    p2p: p2p_url.clone(),
+                }),
+                None,
+                None,
+            ),
+            TransportOptions::Iroh(settings) => {
+                let preset = settings
+                    .secret_file
+                    .as_ref()
+                    .map(|path| {
+                        let text = read_secret(path)
+                            .map_err(|_| ProcessError("Invalid Iroh secret file"))?;
+                        IrohIdentity::from_hex(&text)
+                            .map_err(|_| ProcessError("Invalid Iroh secret file"))
+                    })
+                    .transpose()?;
+                (
+                    ExpectedTransport::Iroh,
+                    Some(iroh_options(settings)?),
+                    preset,
+                )
+            }
         };
         let restored = lifecycle::load(&store, &expected)
             .map_err(|_| ProcessError("Stored guardian configuration invalid"))?;
+        if let (Some(restored), Some(preset)) = (&restored, &preset)
+            && restored.config().iroh_peers().is_none_or(|(stored, _)| {
+                stored.api_public() != preset.api_public()
+                    || stored.p2p_public() != preset.p2p_public()
+            })
+        {
+            return Err(ProcessError(
+                "Stored Iroh identity differs from secret file",
+            ));
+        }
         if restored.as_ref().is_some_and(|restored| {
             restored.config().modules().wallet().config().network != options.bitcoin_network
         }) {
@@ -428,14 +529,21 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
         }
         let api_listener = TcpListener::bind(options.api_bind)
             .map_err(|_| ProcessError("API listener bind failed"))?;
-        let peer_listener = TcpListener::bind(options.p2p_bind)
-            .map_err(|_| ProcessError("Guardian listener bind failed"))?;
+        // An Iroh guardian binds its P2P UDP endpoint when networking starts.
+        let peer_listener = match iroh {
+            None => Some(
+                TcpListener::bind(options.p2p_bind)
+                    .map_err(|_| ProcessError("Guardian listener bind failed"))?,
+            ),
+            Some(_) => None,
+        };
         drop(startup);
         if shutdown.is_requested() {
             return Ok(());
         }
         let context = Context {
             options: &options,
+            iroh,
             store,
             backend,
             admin,
@@ -443,23 +551,34 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
             shutdown,
         };
         let (service, jobs) = if let Some(restored) = restored {
-            let addresses = resolve_peers(restored.peer_urls(), shutdown)?;
-            let ready = restored
-                .connect(peer_listener, addresses, 256)
-                .map_err(|_| ProcessError("Guardian reconnect failed"))?;
+            let config = restored.config().clone();
+            let ready = match (&context.iroh, peer_listener) {
+                (Some(iroh), _) => restored.connect_iroh(options.p2p_bind, iroh.clone(), 256),
+                (None, Some(listener)) => {
+                    let addresses = resolve_peers(restored.peer_urls(), shutdown)?;
+                    restored.connect(listener, addresses, 256)
+                }
+                (None, None) => return Err(ProcessError("Guardian listener missing")),
+            }
+            .map_err(|_| ProcessError("Guardian reconnect failed"))?;
             let running = context.start_running(ready, &mut owners)?;
-            (Arc::new(Service::restored(running)), None)
+            let service = Arc::new(Service::restored(running));
+            context.start_iroh_api(&config, &service, &mut owners)?;
+            (service, None)
         } else {
-            let (setup, jobs) = SetupApi::new(
-                SetupState::new(
-                    options.api_url.clone(),
-                    options.p2p_url.clone(),
+            let state = match &options.transport {
+                TransportOptions::Tcp { api_url, p2p_url } => SetupState::new(
+                    api_url.clone(),
+                    p2p_url.clone(),
                     options.bitcoin_network,
                     "0.13.0".into(),
                 ),
-                context.admin.clone(),
-            )
-            .map_err(|_| ProcessError("Setup API initialization failed"))?;
+                TransportOptions::Iroh(_) => {
+                    SetupState::new_iroh(options.bitcoin_network, "0.13.0".into(), preset)
+                }
+            };
+            let (setup, jobs) = SetupApi::new(state, context.admin.clone())
+                .map_err(|_| ProcessError("Setup API initialization failed"))?;
             (
                 Arc::new(Service::setup(Arc::new(setup))),
                 Some((jobs, peer_listener)),
@@ -491,11 +610,18 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
             };
             let plan = SetupPlan::new(job, &expected)
                 .map_err(|_| ProcessError("Guardian setup configuration invalid"))?;
-            let addresses = resolve_peers(plan.peer_urls(), shutdown)?;
-            owners.generation = Some(
-                plan.start(context.store.clone(), peer_listener, addresses, 256)
-                    .map_err(|_| ProcessError("Guardian generation startup failed"))?,
-            );
+            let generation = match (&context.iroh, peer_listener) {
+                (Some(iroh), _) => {
+                    plan.start_iroh(context.store.clone(), options.p2p_bind, iroh.clone(), 256)
+                }
+                (None, Some(listener)) => {
+                    let addresses = resolve_peers(plan.peer_urls(), shutdown)?;
+                    plan.start(context.store.clone(), listener, addresses, 256)
+                }
+                (None, None) => return Err(ProcessError("Guardian listener missing")),
+            };
+            owners.generation =
+                Some(generation.map_err(|_| ProcessError("Guardian generation startup failed"))?);
             while !owners
                 .generation
                 .as_ref()
@@ -517,6 +643,7 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
                 owners.network = Some(ready.network);
                 return Ok(());
             }
+            let config = ready.config.clone();
             let running = context.start_running(ready, &mut owners)?;
             if shutdown.is_requested() {
                 return Ok(());
@@ -524,6 +651,7 @@ pub fn run(options: Options, shutdown: &Shutdown) -> Result<(), ProcessError> {
             service
                 .install(running)
                 .map_err(|_| ProcessError("Running API installation failed"))?;
+            context.start_iroh_api(&config, &service, &mut owners)?;
         }
         let mut next_refresh = Instant::now();
         while !shutdown.is_requested() {

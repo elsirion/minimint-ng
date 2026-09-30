@@ -28,7 +28,19 @@ pub struct CallContext<'a> {
     cancelled: &'a AtomicBool,
     disconnected: &'a AtomicBool,
 }
-impl CallContext<'_> {
+impl<'a> CallContext<'a> {
+    /// For transports other than the WebSocket listener (Iroh API streams).
+    pub(crate) fn new(
+        deadline: Instant,
+        cancelled: &'a AtomicBool,
+        disconnected: &'a AtomicBool,
+    ) -> Self {
+        Self {
+            deadline,
+            cancelled,
+            disconnected,
+        }
+    }
     pub fn is_cancelled(&self) -> bool {
         self.cancelled.load(Ordering::Acquire)
             || self.disconnected.load(Ordering::Acquire)
