@@ -41,6 +41,22 @@ Select implementation assignments with `MINIMINT_MIXED_NEW_PEERS=0,1` (default) 
 
 Set `MINIMINT_MIXED_RECOVERY_CHECKS=1` to check signed synthetic opaque backups, timestamp replacement/rejection and five empty Mint queries, then stop/join/restart all four guardians and verify retained recovery. Combine with `MINIMINT_MIXED_SETUP_ONLY=1` for the short setup/recovery scenario. This branch does not establish signed-session or monetary success. The helper retains only public synthetic requests/replies; its backup signing secret stays in memory.
 
+## Mixed Iroh federation
+
+`tests/mixed_iroh_process.rs` runs a fresh Iroh federation of reference guardians Alice/Dave (peers 0 and 3), minimint-ng as Bob (peer 1, so it both accepts from peer 0 and dials peers 2 and 3) and Carol (peer 2), who is aontas when `MINIMINT_AONTAS_GUARDIAN` names its `aontas-guardiand` build and otherwise the reference. The pinned reference is checked through `version-hash` rather than a file digest because Nix and Cargo builds of the same revision differ. Build aontas from a pristine export of its own checkout (`git archive HEAD`, then `nix develop path:<export> -c cargo build --locked -p aontas-guardiand`) so its working tree is untouched.
+
+```sh
+export MINIMINT_REFERENCE_DAEMON=/path/to/fedimintd      # nix build github:fedimint/fedimint/<rev>#fedimintd
+export MINIMINT_REFERENCE_CLI=/path/to/fedimint-cli      # optional client checks
+export MINIMINT_AONTAS_GUARDIAN=/path/to/aontas-guardiand # optional
+export MINIMINT_BITCOIN_RPC=127.0.0.1:18443
+export MINIMINT_BITCOIN_CREDENTIALS_FILE=/private/regtest/credentials  # user:password
+export MINIMINT_IROH_CATCHUP=1                           # optional outage/catch-up
+nix-shell --run 'cargo test --locked --test mixed_iroh_process -- --ignored --nocapture'
+```
+
+Every guardian gets pre-generated Iroh secrets (reference: `FM_IROH_{API,P2P}_SECRET_KEY_OVERRIDE`; minimint-ng: `--iroh-secret-file`; aontas: `--iroh-key-file`) so that all endpoint keys can be mapped to loopback UDP addresses before launch (`FM_IROH_CONNECT_OVERRIDES_PLAIN`, `--iroh-address-file`). Discovery, pkarr and relays are disabled; the reference's transitional Iroh 1.0 API is off (`--enable-iroh-next false`). The test checks endpoint-variant-1 setup codes, all-four DKG, byte-identical `client_config`, federation ID and legacy server hash, `client_config` fetched over Iroh from every guardian by this implementation's Iroh 0.35 client, and identical, quorum-signed sessions. With the CLI it joins through an invite naming only minimint-ng's `iroh://` endpoint and queries minimint-ng directly (`dev api --peer-id 1`). With catch-up it stops minimint-ng, waits until the other three complete the next session and requires the restarted guardian to adopt it through the Iroh API. It never mines and makes no monetary claim; public evidence is kept under the printed `/tmp/minimint-iroh-evidence-*` directory.
+
 ## Monetary and failure gates
 
 The ignored `wallet_live_accepts_threshold_consolidation_and_withdrawal` test provides a separate direct Wallet/Core check with fixed test keys. It mutates the exclusively owned regtest node: two 100,000-satoshi funding outputs, one 50,000-satoshi withdrawal, at most 50,000 sats in total fees and 21 mined blocks. It has a 300-second owned process-group deadline and records signed bytes/budget intent before broadcast. Review its verified artifact, RPC and wallet prerequisites before invoking it; do not include it in ordinary offline validation or repeat it after an uncertain funding outcome. Its reported pass does not close mixed Mint/core monetary gates.

@@ -500,3 +500,45 @@ fn iroh_four_guardian_setup_commits_iroh_map_and_restarts() {
             .unwrap();
     }
 }
+
+/// PIT-039: the preserved mixed reference/aontas/minimint-ng run committed
+/// `iroh://<hex API key>` endpoints; recomputing CFG-001 over them reproduces
+/// the federation ID the reference client reported.
+#[test]
+fn preserved_mixed_iroh_federation_id_commits_derived_endpoints() {
+    use minimint_ng::config::{Endpoint, federation_id};
+    use sonic_rs::JsonContainerTrait;
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("tests/fixtures/interop/mixed-iroh-aontas-2026-09-30");
+    let read = |name: &str| {
+        minimint_ng::json::parse(&std::fs::read(dir.join(name)).unwrap(), 1 << 20, 64).unwrap()
+    };
+    let (config, roles, client) = (
+        read("client_config.json"),
+        read("roles.json"),
+        read("client.json"),
+    );
+    let endpoints: BTreeMap<PeerId, Endpoint> = config["api_endpoints"]
+        .as_object()
+        .unwrap()
+        .iter()
+        .map(|(peer, endpoint)| {
+            (
+                PeerId(peer.parse().unwrap()),
+                Endpoint {
+                    url: CanonicalUrl::simple(endpoint["url"].as_str().unwrap()).unwrap(),
+                    name: endpoint["name"].as_str().unwrap().to_owned(),
+                },
+            )
+        })
+        .collect();
+    assert_eq!(endpoints.len(), 4);
+    for (peer, endpoint) in &endpoints {
+        let key = roles["api_keys"][usize::from(peer.0)].as_str().unwrap();
+        assert_eq!(endpoint.url.as_str(), format!("iroh://{key}"));
+    }
+    assert_eq!(
+        minimint_ng::codec::text::hex_encode(&federation_id(&endpoints)),
+        client["info"]["federation_id"].as_str().unwrap()
+    );
+}

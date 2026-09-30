@@ -77,3 +77,11 @@ Status: implementation decision for the signet/Esplora profile; related to Q16. 
 ## PIT-037 — Signet first block vote is the remote tip minus six and skips the scan
 
 Status: documented trap. WAL-003 skips scanning on the first non-regtest advance from zero. On Mutinynet (height above 3.4 million, ~30 s blocks) the first consensus count jumps to the remote tip minus six without fetching history; later proposals are capped at current count plus five. Deposits made before the federation's first agreed count are therefore never discovered. The wallet poll interval against a shared Esplora service is five seconds (local scheduling policy only).
+
+## PIT-038 — Iroh P2P and Iroh API are different Iroh versions
+
+Status: black-box confirmed against the pinned reference. Guardian P2P (NET-002) runs over Iroh 1.0.3 and the client API (API-002) over Iroh 0.35.0; the two stacks do not interoperate, so one guardian needs both and two endpoint identities (SET-002). The reference additionally offers a transitional Iroh 1.0 API advertised through signed guardian metadata (`iroh_next_endpoint`, CFG-007); it is optional and not implemented here. A mixed 3-reference + 1-minimint-ng federation completed Iroh DKG and matched `client_config` only with this split.
+
+## PIT-039 — The Iroh client endpoint URL is derived, not stored
+
+Status: specification gap; observed interoperable form. SET-006 commits only `(name, API key, P2P key)` for Iroh and leaves the TCP API map empty, but the client configuration (CFG-002) and therefore the federation ID (CFG-001) need an endpoint map. The reference and aontas use `iroh://` followed by the 64 lowercase hexadecimal API key, with no trailing slash, and the guardian name. The mixed run's four `client_config` responses and federation IDs were byte-identical with this derivation. `server_config_consensus_hash` (API-009) still omits the Iroh map.

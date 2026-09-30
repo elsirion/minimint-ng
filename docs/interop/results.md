@@ -1,6 +1,6 @@
 # Interoperability results
 
-Updated 2026-09-10. Authority: spec `06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c`; reference `0c316439d60b5a08eea26fab216780eb893c45bf`. This is an evidence ledger, not a complete-conformance claim.
+Updated 2026-09-30. Authority: spec `06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c`; reference `0c316439d60b5a08eea26fab216780eb893c45bf`. This is an evidence ledger, not a complete-conformance claim.
 
 | Scenario | Result | Evidence and limits |
 |---|---|---|
@@ -10,6 +10,8 @@ Updated 2026-09-10. Authority: spec `06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c`; 
 | Live Bitcoin Core backend | Two tests passed | Core 31.1 regtest, height 101/count 102, raw blocks and txids checked at heights 0/1/101; genuine absent fee estimate preserved. A Core-wallet-signed self-transfer was broadcast and matched in the mempool. No guardian multisig spend. |
 | Mixed monetary workflows | Attempted; stopped at spec/baseline conflict | A real deposit was mined and discovered on all four peers, but no claim or issuance completed. Consolidation, reissuance, withdrawal and pending-change spending remain required. |
 | Mixed outage/restart and two-peer barrier | All four nonmonetary survivor sets and bounded barrier passed | Monetary operations under each outage and unseen monetary suffix replay remain required; inverse nonmonetary assignment passed separately below. |
+| Mixed Iroh: 2 reference + aontas + minimint-ng | Passed, 527.39 s (2026-09-30) | Fresh Iroh setup (endpoint variant 1), DKG in 20.5 s, byte-identical `client_config`/federation ID/legacy hash with `iroh://` endpoints, `client_config` over Iroh 0.35 from all four, identical session 0 with valid q=3 certificates on all four; pinned `fedimint-cli` joined through an invite naming only minimint-ng and queried it directly over Iroh; minimint-ng stopped, the other three completed session 1, and after restart it adopted session 1 through Iroh API catch-up. Discovery/relays off with loopback overrides; reference transitional Iroh 1.0 API off. Public evidence: `tests/fixtures/interop/mixed-iroh-aontas-2026-09-30`. No monetary claim. |
+| Mixed Iroh: 3 reference + minimint-ng | Passed, 185.74 s (2026-09-30) | Same checks without aontas or catch-up; DKG in 3.7 s, session 0 identical on all four. An earlier run reached the same session and failed only in the harness (reused an idle WebSocket); corrected before this run. |
 | Complete advertised core API 0.9 | Incomplete | Required schema questions and operational behavior remain open; current daemon advertises no core minor. |
 
 ## Inverse assignment and recovery checks

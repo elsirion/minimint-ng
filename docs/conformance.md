@@ -1,6 +1,10 @@
 # Implementation status
 
-Updated 2026-09-11. Protocol baseline `0c316439d60b5a08eea26fab216780eb893c45bf`; spec `06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c`.
+Updated 2026-09-30. Protocol baseline `0c316439d60b5a08eea26fab216780eb893c45bf`; spec `06277f7e8e2c5cde5b1fe9b768f37f987e3c0c4c`.
+
+## Iroh transport checkpoint (2026-09-30)
+
+`--transport iroh` implements NET-002 guardian P2P over Iroh 1.0.3 and API-002 over Iroh 0.35.0, including setup/DKG, agreement, the client API and history catch-up; TCP/mTLS + WebSocket remains the default and unchanged. Mixed Iroh federations passed with **2 reference + aontas + minimint-ng** (527.39 s, including reference-client join through minimint-ng and an outage with Iroh catch-up) and **3 reference + minimint-ng** (185.74 s); see [results](interop/results.md) and the [runbook](interop/runbook.md#mixed-iroh-federation). Validation: `cargo fmt --check`, library/binary Clippy with warnings denied, and `cargo test --locked --no-fail-fast` over 70 targets: a complete run passed **361 entries with zero failures and 8 ignored** (the new mixed Iroh test is ignored by default), and the added fixture test passes. Two targets are intermittently flaky on this host independently of this change, reproduced on a pristine export of the `mutinynet` base: `agreement_restart` (3 of 25 runs) and `daemon_resolve` (7 of 20, `Spawn` errors when executing freshly written helper scripts); 16 dependency-policy regressions and `tools/dependencies.py check` pass with the regenerated 629-package inventory. The dependency addition and its narrowed wasm-only engine-closure exception are recorded in the [dependency review](dependency-review.md#iroh-transport-selection-2026-09-30); PIT-038/039 record the version split and the derived `iroh://` endpoint form. Open: the reference's transitional Iroh 1.0 API and signed guardian metadata advertisement are not implemented; signed WebSocket endpoint announcements are not applied to Iroh catch-up; no monetary workflow has run over Iroh.
 
 ## Current integration checkpoint
 
